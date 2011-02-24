@@ -3,6 +3,7 @@ from setuptools import setup, find_packages
 import os, sys
 
 version = '0.1.0'
+long_description = open("README.txt").read()
 
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -18,7 +19,7 @@ setup(
      name='blockdiagcontrib-square',
      version=version,
      description='noderenderer plugin for blockdiag',
-     long_description='noderenderer plugin for blockdiag',
+     long_description=long_description,
      classifiers=classifiers,
      keywords=['diagram','generator'],
      author='Takeshi Komiya',
