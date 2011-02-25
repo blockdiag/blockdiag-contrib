@@ -26,11 +26,13 @@ setup(
      author_email='i.tkomiya at gmail.com',
      url='http://tk0miya.bitbucket.org/blockdiag/build/html/index.html',
      license='PSL',
-     packages=find_packages('blockdiagcontrib'),
+     packages=find_packages(),
      package_data = {'': ['buildout.cfg']},
+     namespace_packages=['blockdiagcontrib'],
      include_package_data=True,
      install_requires=[
         'blockdiag',
+        'setuptools',
      ],
      entry_points="""
         [blockdiag_noderenderer]
