@@ -39,11 +39,18 @@ class QB(Box):
                 rx = w - r
                 ry = r / 2
 
-            path = pathdata(xy.x - rx, y)
-            path.ellarc(rx / 2, ry, 0, 0, 0, xy.x, y)
-            path.ellarc(rx / 2, ry, 0, 0, 0, xy.x + rx, y)
+            if format == 'SVG':
+                path = pathdata(xy.x - rx, y)
+                path.ellarc(rx / 2, ry, 0, 0, 0, xy.x, y)
+                path.ellarc(rx / 2, ry, 0, 0, 0, xy.x + rx, y)
 
-            drawer.path(path, fill="none", outline=fill)
+                drawer.path(path, fill="none", outline=fill)
+            else:
+                box = (xy.x - rx, y - ry, xy.x, y + ry)
+                drawer.arc(box, 0, 180, fill=fill)
+
+                box = (xy.x, y - ry, xy.x + rx, y + ry)
+                drawer.arc(box, 0, 180, fill=fill)
 
     def render_eye(self, drawer, center):
         m = self.metrix
@@ -63,3 +70,4 @@ class QB(Box):
 
 def setup(self):
     install_renderer('qb', QB)
+    install_renderer('QB', QB)
