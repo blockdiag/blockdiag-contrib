@@ -32,9 +32,17 @@ class QB(Box):
             xy = self.metrix.cell(self.node).bottom()
             y = xy.y - h * 3 / 2 + r / 2
 
-            path = pathdata(xy.x - r * 3, y)
-            path.ellarc(r * 3 / 2, h * 3 / 4, 0, 0, 0, xy.x, y)
-            path.ellarc(r * 3 / 2, h * 3 / 4, 0, 0, 0, xy.x + r * 3, y)
+            if w > r * 3:
+                rx = r * 3
+                ry = r * 3 / 4
+            else:
+                rx = w - r
+                ry = r / 2
+
+            path = pathdata(xy.x - rx, y)
+            path.ellarc(rx / 2, ry, 0, 0, 0, xy.x, y)
+            path.ellarc(rx / 2, ry, 0, 0, 0, xy.x + rx, y)
+
             drawer.path(path, fill="none", outline=fill)
 
     def render_eye(self, drawer, center):
