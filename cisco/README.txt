@@ -1,7 +1,11 @@
 ======================
 blockdiagcontrib-cisco
 ======================
-A plugin for `blockdiag` that provides node-renderers for networking
+A plugin for `blockdiag` that provides shapes for networking.
+The shapes are using `Network Topology Icons`_ designed by `Cisco Systems, Inc`_ .
+
+.. _Network Topology Icons: http://www.cisco.com/web/about/ac50/ac47/2.html
+.. _Cisco Systems, Inc: http://www.cisco.com/
 
 Diagram examples
 ================
