@@ -10,6 +10,8 @@ Example::
       A [shape = "cisco.router"];
     }
 
+See more examples and output images in http://packages.python.org/blockdiagcontrib-cisco/ .
+
 
 Requirements
 ============
