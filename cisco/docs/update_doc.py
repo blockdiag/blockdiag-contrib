@@ -14,6 +14,19 @@ def to_classname(filename):
     return "cisco.%s" % filename
 
 
+def print_manual_headers():
+    readme = os.path.join(os.path.dirname(__file__), '../README.txt')
+    print open(readme).read()
+
+    print ""
+
+    print "Shapes"
+    print "======="
+    print ""
+
+
+print_manual_headers()
+
 print ".. list-table::"
 print "   :header-rows: 0"
 
