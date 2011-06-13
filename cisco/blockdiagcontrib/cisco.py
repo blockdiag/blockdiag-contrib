@@ -25,7 +25,12 @@ except ImportError:
     from blockdiag.utils.TextFolder import TextFolder
 
 
-def gen_image_class(image_path):
+def gen_image_class(image_path, baseurl=None):
+    if baseurl:
+        image_url = "%s/%s" % (baseurl, os.path.basename(image_path))
+    else:
+        image_url = image_path
+
     class CiscoImage(NodeShape):
         def __init__(self, node, metrix=None):
             super(CiscoImage, self).__init__(node, metrix)
@@ -76,7 +81,7 @@ def gen_image_class(image_path):
 
         def render_shape(self, drawer, format, **kwargs):
             if not kwargs.get('shadow'):
-                drawer.loadImage(self.image_path, self.image_box)
+                drawer.loadImage(image_url, self.image_box)
 
     return CiscoImage
 
@@ -159,11 +164,11 @@ def to_classname(filename):
     return "cisco.%s" % filename
 
 
-def setup(self):
+def setup(self, baseurl=None):
     path = "%s/images/cisco" % os.path.dirname(__file__)
     dir = os.listdir(path)
     for filename in dir:
-        klass = gen_image_class("%s/%s" % (path, filename))
+        klass = gen_image_class("%s/%s" % (path, filename), baseurl)
         klassname = to_classname(filename)
 
         install_renderer(klassname, klass)
