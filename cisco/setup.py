@@ -31,7 +31,7 @@ setup(
      namespace_packages=['blockdiagcontrib'],
      include_package_data=True,
      install_requires=[
-        'blockdiag',
+        'blockdiag>=0.9.1',
         'setuptools',
      ],
      entry_points="""
