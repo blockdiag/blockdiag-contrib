@@ -39,7 +39,10 @@ def gen_image_class(image_path, baseurl=None):
             self.textalign = 'left'
             self.image_path = image_path
 
+            box = metrix.cell(node).box()
+            bounded = (box[2] - box[0], box[3] - box[1])
             size = images.get_image_size(image_path)
+            size = images.calc_image_size(size, bounded)
 
             pt = metrix.cell(node).center()
             self.image_box = [pt.x - size[0] / 2, pt.y - size[1] / 2,
