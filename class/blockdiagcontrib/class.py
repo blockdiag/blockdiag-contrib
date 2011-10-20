@@ -10,7 +10,7 @@ class Class(Box):
 
         fill = kwargs.get('fill')
 
-        r = self.metrix.nodeHeight / 3
+        r = self.metrics.node_height / 3
 
         if not kwargs.get('shadow'):
             box = self.textbox
@@ -25,7 +25,7 @@ class Class(Box):
         font = kwargs.get('font')
         fill = kwargs.get('fill')
 
-        r = self.metrix.nodeHeight / 3
+        r = self.metrics.node_height / 3
 
         if not kwargs.get('shadow'):
             box = self.textbox
@@ -35,14 +35,14 @@ class Class(Box):
             classbox = (box[0], box[1], box[2], box[1] + r)
             drawer.textarea(classbox, texts[0],
                             fill=fill, halign=self.textalign,
-                            font=font, fontsize=self.metrix.fontSize,
-                            lineSpacing=self.metrix.lineSpacing)
+                            font=font, fontsize=self.metrics.fontsize,
+                            lineSpacing=self.metrics.line_spacing)
 
             variablebox = (box[0], box[1] + r + 4, box[2], box[3])
             drawer.textarea(variablebox, texts[1],
                             fill=fill, halign='left', valign='top',
-                            font=font, fontsize=self.metrix.fontSize,
-                            lineSpacing=self.metrix.lineSpacing)
+                            font=font, fontsize=self.metrics.fontsize,
+                            lineSpacing=self.metrics.line_spacing)
 
 
 def setup(self):
