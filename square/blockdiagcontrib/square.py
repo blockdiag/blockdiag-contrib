@@ -5,11 +5,11 @@ from blockdiag.utils.XY import XY
 
 
 class Square(NodeShape):
-    def __init__(self, node, metrix=None):
-        super(Square, self).__init__(node, metrix)
+    def __init__(self, node, metrics=None):
+        super(Square, self).__init__(node, metrics)
 
-        r = min(metrix.nodeWidth, metrix.nodeHeight) / 2 + metrix.cellSize / 2
-        pt = metrix.cell(node).center()
+        r = min(metrics.node_width, metrics.node_height) / 2 + metrics.cellsize / 2
+        pt = metrics.cell(node).center
         self.connectors = [XY(pt.x, pt.y - r),  # top
                            XY(pt.x + r, pt.y),  # right
                            XY(pt.x, pt.y + r),  # bottom
