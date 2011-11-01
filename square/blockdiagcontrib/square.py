@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from blockdiag.noderenderer import NodeShape
 from blockdiag.noderenderer import install_renderer
-from blockdiag.utils.XY import XY
+from blockdiag.utils import Box, XY
 
 
 class Square(NodeShape):
@@ -14,7 +14,7 @@ class Square(NodeShape):
                            XY(pt.x + r, pt.y),  # right
                            XY(pt.x, pt.y + r),  # bottom
                            XY(pt.x - r, pt.y)]  # left
-        self.textbox = (pt.x - r, pt.y - r, pt.x + r, pt.y + r)
+        self.textbox = Box(pt.x - r, pt.y - r, pt.x + r, pt.y + r)
 
     def render_shape(self, drawer, format, **kwargs):
         outline = kwargs.get('outline')

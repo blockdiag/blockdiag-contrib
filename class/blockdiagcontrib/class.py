@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from blockdiag.noderenderer.box import Box
 from blockdiag.noderenderer import install_renderer
-from blockdiag.utils.XY import XY
+from blockdiag.utils import XY
 
 
 class Class(Box):
@@ -22,7 +22,6 @@ class Class(Box):
             drawer.line(line, fill=fill)
 
     def render_label(self, drawer, **kwargs):
-        font = kwargs.get('font')
         fill = kwargs.get('fill')
 
         r = self.metrics.node_height / 3
@@ -35,13 +34,13 @@ class Class(Box):
             classbox = (box[0], box[1], box[2], box[1] + r)
             drawer.textarea(classbox, texts[0],
                             fill=fill, halign=self.textalign,
-                            font=font, fontsize=self.metrics.fontsize,
+                            fontsize=self.node.fontsize,
                             lineSpacing=self.metrics.line_spacing)
 
             variablebox = (box[0], box[1] + r + 4, box[2], box[3])
             drawer.textarea(variablebox, texts[1],
                             fill=fill, halign='left', valign='top',
-                            font=font, fontsize=self.metrics.fontsize,
+                            fontsize=self.node.fontsize,
                             lineSpacing=self.metrics.line_spacing)
 
 
