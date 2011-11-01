@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from blockdiag.noderenderer.box import Box
 from blockdiag.noderenderer import install_renderer
-from blockdiag.utils.XY import XY
+from blockdiag.utils import XY
 from blockdiag.imagedraw.simplesvg import pathdata
 
 
@@ -14,13 +14,13 @@ class QB(Box):
 
         # draw outline
         if not kwargs.get('shadow'):
-            m = self.metrix
-            h = m.nodeHeight / 4
-            w = m.nodeWidth / 6
-            r = m.cellSize
+            m = self.metrics
+            h = m.node_height / 4
+            w = m.node_width / 6
+            r = m.cellsize
 
             # left eye
-            xy = self.metrix.cell(self.node).top()
+            xy = self.metrics.cell(self.node).top
             left = XY(xy.x - w, xy.y + h)
             self.render_eye(drawer, left)
 
@@ -29,7 +29,7 @@ class QB(Box):
             self.render_eye(drawer, right)
 
             # left mouthline
-            xy = self.metrix.cell(self.node).bottom()
+            xy = self.metrics.cell(self.node).bottom
             y = xy.y - h * 3 / 2 + r / 2
 
             if w > r * 3:
@@ -53,17 +53,17 @@ class QB(Box):
                 drawer.arc(box, 0, 180, fill=fill)
 
     def render_eye(self, drawer, center):
-        m = self.metrix
+        m = self.metrics
 
-        r = m.cellSize
+        r = m.cellsize
         eye = (center.x - r, center.y - r, center.x + r, center.y + r)
         drawer.ellipse(eye, fill='orange', outline='orange')
 
-        r = m.cellSize * 2 / 3
+        r = m.cellsize * 2 / 3
         eye = (center.x - r, center.y - r, center.x + r, center.y + r)
         drawer.ellipse(eye, fill='red', outline='red')
 
-        r = m.cellSize / 3
+        r = m.cellsize / 3
         eye = (center.x + r, center.y - r * 3, center.x + r * 3, center.y - r)
         drawer.ellipse(eye, fill='white', outline='white')
 
