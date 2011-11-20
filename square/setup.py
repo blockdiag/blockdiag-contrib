@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 import os, sys
 
-version = '0.1.2'
+version = '0.1.3'
 long_description = open("README.txt").read()
 
 classifiers = [
@@ -24,19 +24,15 @@ setup(
      keywords=['diagram','generator'],
      author='Takeshi Komiya',
      author_email='i.tkomiya at gmail.com',
-     url='http://tk0miya.bitbucket.org/blockdiag/build/html/index.html',
+     url='http://blockdiag.com/',
      license='PSL',
      packages=find_packages(),
      package_data = {'': ['buildout.cfg']},
      namespace_packages=['blockdiagcontrib'],
      include_package_data=True,
      install_requires=[
-        'blockdiag>=0.9.7',
+        'blockdiag>=1.1.0',
         'setuptools',
      ],
-     entry_points="""
-        [blockdiag_noderenderer]
-        square = blockdiagcontrib.square
-     """,
 )
 
