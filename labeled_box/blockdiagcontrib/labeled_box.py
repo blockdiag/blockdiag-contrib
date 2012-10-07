@@ -88,6 +88,10 @@ class LabeledBox(BoxShape):
 
 
 class LabeledBoxHandler(NodeHandler):
+    def on_created(self, node):
+        if node.shape == 'labeled_box' and getattr(node, 'toplabel', None) is None:
+            node.toplabel = None
+
     def on_attr_changed(self, node, attr):
         if attr.name == 'shape' and attr.value == 'labeled_box':
             node.toplabel = None
