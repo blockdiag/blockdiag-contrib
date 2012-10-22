@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 import os, sys
 
-version = '0.1.5'
+version = '0.1.7'
 long_description = open("README.txt").read()
 
 classifiers = [
@@ -31,7 +31,7 @@ setup(
      namespace_packages=['blockdiagcontrib'],
      include_package_data=True,
      install_requires=[
-        'blockdiag>=0.9.7',
+        'blockdiag>=1.2.0',
         'setuptools',
      ],
      entry_points="""
