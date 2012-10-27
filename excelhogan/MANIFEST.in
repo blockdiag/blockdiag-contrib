@@ -2,4 +2,3 @@ include buildout.cfg
 include bootstrap.py
 include LICENSE
 include MANIFEST.in
-recursive-include blockdiagcontrib
