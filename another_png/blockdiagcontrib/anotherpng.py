@@ -15,8 +15,8 @@
 
 import Image
 import ImageDraw
-from blockdiag.imagedraw import base
-from blockdiag.utils import XY
+from blockdiag.imagedraw import base, textfolder
+from blockdiag.utils import Size, XY
 
 
 def dots_of_line(pt1, pt2):
@@ -48,6 +48,23 @@ def dots_of_line(pt1, pt2):
             y += m
 
 
+def text_bitmap(string, size):
+    draw = PNGImageDraw(None)
+    draw.set_canvas_size(size)
+    draw.drawer.text((0, 0), string, fill='black')
+
+    bitmap = [[] for _ in range(size.height)]
+    for i, pixel in enumerate(draw.image.getdata()):
+        if pixel[-1]:
+            data = 1
+        else:
+            data = 0
+
+        bitmap[i % size.width].append(data)
+
+    return bitmap
+
+
 class PNGImageDraw(base.ImageDraw):
     def __init__(self, filename, **kwargs):
         self.filename = filename
@@ -77,6 +94,32 @@ class PNGImageDraw(base.ImageDraw):
 
         for pt in dots_of_line(*xy):
             self.drawer.point(pt, fill=fill)
+
+    def textsize(self, string, font, maxwidth=None, **kwargs):
+        if maxwidth is None:
+            maxwidth = 65535
+
+        box = (0, 0, maxwidth, 65535)
+        textbox = textfolder.get(self, box, string, font, **kwargs)
+        return textbox.outlinebox.size
+
+    def textlinesize(self, string, font, **kwargs):
+        s = self.drawer.textsize(string)
+        return Size(s[0], s[1])
+
+    def text(self, xy, string, font, **kwargs):
+        size = self.textlinesize(string, font)
+
+        fill = kwargs.get('fill')
+        for dx, line in enumerate(text_bitmap(string, size)):
+            for dy, pixel in enumerate(line):
+                if pixel:
+                     self.drawer.point(xy.shift(dx, dy), fill=fill)
+
+    def textarea(self, box, string, font, **kwargs):
+        lines = textfolder.get(self, box, string, font, **kwargs)
+        for string, xy in lines.lines:
+            self.text(xy, string, font, **kwargs)
 
     def polygon(self, points, **kwargs):
         fill = kwargs.get('fill')
