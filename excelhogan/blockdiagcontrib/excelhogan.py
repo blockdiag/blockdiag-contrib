@@ -12,3 +12,15 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+
+from blockdiag.imagedraw import base
+
+
+class ExcelHoganImageDraw(base.ImageDraw):
+    def __init__(self, filename, **kwargs):
+        pass
+
+
+def setup(self):
+    from blockdiag.imagedraw import install_imagedrawer
+    install_imagedrawer('hogan.xlsx', ExcelHoganImageDraw)
