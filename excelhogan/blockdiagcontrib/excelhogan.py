@@ -19,7 +19,9 @@ import openpyxl
 from openpyxl.style import Color, Fill
 from openpyxl.cell import get_column_letter
 from blockdiag.imagedraw import base, textfolder
+from blockdiag.imagedraw.png import ttfont_for
 from blockdiag.utils import Size, XY
+from blockdiag.utils.fontmap import FontMap
 
 
 def dots_of_line(pt1, pt2):
@@ -51,10 +53,11 @@ def dots_of_line(pt1, pt2):
             y += m
 
 
-def text_bitmap(string, size):
+def text_bitmap(string, size, font):
+    ttfont = ttfont_for(font)
     draw = ExcelHoganImageDraw(None)
     draw.set_canvas_size(size)
-    draw.drawer.text((0, 0), string, fill='black')
+    draw.drawer.text((0, 0), string, font=ttfont, fill='black')
 
     bitmap = [[] for _ in range(size.width)]
     for i, pixel in enumerate(draw.image.getdata()):
@@ -129,14 +132,24 @@ class ExcelHoganImageDraw(base.ImageDraw):
         return textbox.outlinebox.size
 
     def textlinesize(self, string, font, **kwargs):
-        s = self.drawer.textsize(string)
-        return Size(s[0], s[1])
+        ttfont = ttfont_for(font)
+        if ttfont is None:
+            size = self.drawer.textsize(string, font=None)
+
+            font_ratio = font.size * 1.0 / FontMap.BASE_FONTSIZE
+            size = Size(int(size[0] * font_ratio),
+                        int(size[1] * font_ratio))
+        else:
+            size = self.drawer.textsize(string, font=ttfont)
+            size = Size(*size)
+
+        return size
 
     def text(self, xy, string, font, **kwargs):
         size = self.textlinesize(string, font)
 
         fill = kwargs.get('fill')
-        for dx, line in enumerate(text_bitmap(string, size)):
+        for dx, line in enumerate(text_bitmap(string, size, font)):
             for dy, pixel in enumerate(line):
                 if pixel:
                      self.point(xy.shift(dx, dy), fill=fill)
