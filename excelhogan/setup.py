@@ -37,7 +37,7 @@ setup(
      ],
      entry_points="""
         [blockdiag_imagedrawers]
-        excelhogan = blockdiagcontrib.execlhogan
+        excelhogan = blockdiagcontrib.excelhogan
      """,
 )
 
