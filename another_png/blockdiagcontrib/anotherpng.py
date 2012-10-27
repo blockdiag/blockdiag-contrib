@@ -53,7 +53,7 @@ def text_bitmap(string, size):
     draw.set_canvas_size(size)
     draw.drawer.text((0, 0), string, fill='black')
 
-    bitmap = [[] for _ in range(size.height)]
+    bitmap = [[] for _ in range(size.width)]
     for i, pixel in enumerate(draw.image.getdata()):
         if pixel[-1]:
             data = 1
