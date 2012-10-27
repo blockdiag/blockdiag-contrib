@@ -33,7 +33,7 @@ setup(
      install_requires=[
         'blockdiag>=1.2.0',
         'setuptools',
-        'xlwt',
+        'openpyxl',
      ],
      entry_points="""
         [blockdiag_imagedrawers]
