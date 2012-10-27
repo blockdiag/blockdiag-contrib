@@ -16,12 +16,38 @@
 import Image
 import ImageDraw
 from blockdiag.imagedraw import base
+from blockdiag.imagedraw.png import dashize_line
 
 
 class PNGImageDraw(base.ImageDraw):
     def __init__(self, filename, **kwargs):
-        self.filenaem = filename
+        self.filename = filename
+        self.image = None
+        self.drawer = None
 
+    def set_canvas_size(self, size):
+        self.image = Image.new('RGBA', size)
+        self.drawer = ImageDraw.Draw(self.image)
+
+    def rectangle(self, box, **kwargs):
+        fill = kwargs.get('fill')
+        if fill:
+            for x in range(box.x1, box.x2 + 1):
+                for y in range(box.y1, box.y2 + 1):
+                    self.drawer.point((x, y), fill=fill)
+
+        outline = kwargs.get('outline')
+        if outline:
+            for x in range(box.x1, box.x2 + 1):
+                self.drawer.point((x, box.y1), fill=outline)
+                self.drawer.point((x, box.y2), fill=outline)
+
+            for y in range(box.y1, box.y2 + 1):
+                self.drawer.point((box.x1, y), fill=outline)
+                self.drawer.point((box.x2, y), fill=outline)
+
+    def save(self, filename, size, format):
+        self.image.save(self.filename, 'PNG')
 
 
 def setup(self):
