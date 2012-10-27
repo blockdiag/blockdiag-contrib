@@ -16,7 +16,36 @@
 import Image
 import ImageDraw
 from blockdiag.imagedraw import base
-from blockdiag.imagedraw.png import dashize_line
+from blockdiag.utils import XY
+
+
+def dots_of_line(pt1, pt2):
+    if pt1.x == pt2.x:  # vertical
+        if pt1.y > pt2.y:
+            pt2, pt1 = pt1, pt2
+
+        for y in xrange(pt1.y, pt2.y + 1):
+            yield XY(pt1.x, y)
+
+    elif pt1.y == pt2.y:  # horizontal
+        if pt1.x > pt2.x:
+            pt2, pt1 = pt1, pt2
+
+        for x in xrange(pt1.x, pt2.x + 1):
+            yield XY(x, pt1.y)
+    else:  # diagonal
+        if pt1.x > pt2.x:
+            pt2, pt1 = pt1, pt2
+
+        # DDA (Digital Differential Analyzer) Algorithm
+        m = float(pt2.y - pt1.y) / float(pt2.x - pt1.x)
+        x = pt1.x
+        y = pt1.y
+
+        while x <= pt2.x + 1:
+            yield XY(int(x), int(round(y)))
+            x += 1
+            y += m
 
 
 class PNGImageDraw(base.ImageDraw):
@@ -38,13 +67,16 @@ class PNGImageDraw(base.ImageDraw):
 
         outline = kwargs.get('outline')
         if outline:
-            for x in range(box.x1, box.x2 + 1):
-                self.drawer.point((x, box.y1), fill=outline)
-                self.drawer.point((x, box.y2), fill=outline)
+            self.line((XY(box.x1, box.y1), XY(box.x2, box.y1)), fill=outline)
+            self.line((XY(box.x1, box.y2), XY(box.x2, box.y2)), fill=outline)
+            self.line((XY(box.x1, box.y1), XY(box.x1, box.y2)), fill=outline)
+            self.line((XY(box.x2, box.y1), XY(box.x2, box.y2)), fill=outline)
 
-            for y in range(box.y1, box.y2 + 1):
-                self.drawer.point((box.x1, y), fill=outline)
-                self.drawer.point((box.x2, y), fill=outline)
+    def line(self, xy, **kwargs):
+        fill = kwargs.get('fill')
+
+        for pt in dots_of_line(*xy):
+            self.drawer.point(pt, fill=fill)
 
     def save(self, filename, size, format):
         self.image.save(self.filename, 'PNG')
