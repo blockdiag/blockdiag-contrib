@@ -78,6 +78,16 @@ class PNGImageDraw(base.ImageDraw):
         for pt in dots_of_line(*xy):
             self.drawer.point(pt, fill=fill)
 
+    def polygon(self, points, **kwargs):
+        fill = kwargs.get('fill')
+        if fill:
+            pass
+
+        outline = kwargs.get('outline')
+        if outline:
+            for i in xrange(len(points)):
+                self.line((points[i], points[i - 1]), fill=outline)
+
     def save(self, filename, size, format):
         self.image.save(self.filename, 'PNG')
 
