@@ -23,6 +23,8 @@ from blockdiag.imagedraw.png import ttfont_for
 from blockdiag.utils import Size, XY
 from blockdiag.utils.fontmap import FontMap
 
+import patch  # enable zoomScale feature
+
 
 def dots_of_line(pt1, pt2):
     if pt1.x == pt2.x:  # vertical
@@ -83,6 +85,12 @@ class ExcelHoganImageDraw(base.ImageDraw):
 
         self.book = openpyxl.Workbook()
         self.sheet = self.book.worksheets[0]
+
+        # setup default zoom of sheet
+        sheet_view = openpyxl.worksheet.SheetView()
+        sheet_view.zoomScale = "10"
+        sheet_view.zoomScaleNormal = "10"
+        self.sheet.sheet_view = sheet_view
 
         # setup sheet as HOGAN
         coldim = openpyxl.worksheet.ColumnDimension()
