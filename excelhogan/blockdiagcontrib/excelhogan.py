@@ -88,17 +88,22 @@ class ExcelHoganImageDraw(base.ImageDraw):
 
         # setup default zoom of sheet
         sheet_view = openpyxl.worksheet.SheetView()
-        sheet_view.zoomScale = "10"
-        sheet_view.zoomScaleNormal = "10"
+        sheet_view.zoomScale = "25"
+        sheet_view.zoomScaleNormal = "25"
         self.sheet.sheet_view = sheet_view
 
         # setup sheet as HOGAN
         coldim = openpyxl.worksheet.ColumnDimension()
-        coldim.width = 4
+        coldim.width = 2
+        rowdim = openpyxl.worksheet.RowDimension()
+        rowdim.height = 12
 
         for i in range(1, 26 * 26):
             colname = get_column_letter(i)
             self.sheet.column_dimensions[colname] = coldim
+            self.sheet.row_dimensions[i] = rowdim
+
+            self.sheet.cell(row=i - 1, column=1).value = ' '
 
     def point(self, pt, fill):
         color = "00%02X%02X%02X" % fill
