@@ -87,13 +87,10 @@ class ExcelHoganImageDraw(base.ImageDraw):
         # setup sheet as HOGAN
         coldim = openpyxl.worksheet.ColumnDimension()
         coldim.width = 4
-        rowdim = openpyxl.worksheet.RowDimension()
-        rowdim.height = 4
 
         for i in range(1, 26 * 26):
             colname = get_column_letter(i)
             self.sheet.column_dimensions[colname] = coldim
-            self.sheet.row_dimensions[i] = rowdim
 
     def point(self, pt, fill):
         color = "00%02X%02X%02X" % fill
