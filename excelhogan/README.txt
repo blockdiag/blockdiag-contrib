@@ -9,7 +9,7 @@ Usage
 ======
 Give '-T hogan.xlsx' option to blockdiag command line::
 
-   $ blockdiag -T hogan.xls input.diag
+   $ blockdiag -T hogan.xlsx input.diag
 
 
 Requirements
