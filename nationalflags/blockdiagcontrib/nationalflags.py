@@ -46,7 +46,8 @@ def gen_image_class(image_path, baseurl=None):
             self.textbox = Box(pt.x + size[0] / 2, pt.y - size[1] / 2,
                                pt.x + size[0] / 2 + width, pt.y + size[1] / 2)
 
-            size = self.metrics.textsize(node.label, self.metrics.font_for(None),
+            size = self.metrics.textsize(node.label,
+                                         self.metrics.font_for(None),
                                          self.textbox.width)
 
             self.connectors[0] = XY(pt.x, self.image_box[1])
@@ -63,7 +64,7 @@ def gen_image_class(image_path, baseurl=None):
 
 
 def to_classname(filename):
-    #137px-Flag_of_Lithuania.svg.png 
+    # 137px-Flag_of_Lithuania.svg.png
     filename = re.sub('.svg.png', '', filename)
     filename = re.sub('.*Flag_of_', '', filename)
     filename = re.sub('-', '_', filename)
