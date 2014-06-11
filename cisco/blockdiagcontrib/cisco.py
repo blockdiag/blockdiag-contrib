@@ -56,7 +56,7 @@ def gen_image_class(image_path, baseurl=None):
 
         def render_shape(self, drawer, format, **kwargs):
             if not kwargs.get('shadow'):
-                drawer.loadImage(image_url, self.image_box)
+                drawer.image(self.image_box, image_url)
 
     return CiscoImage
 
