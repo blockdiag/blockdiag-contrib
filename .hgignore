@@ -3,6 +3,8 @@
 .swp
 bin
 _build
+include/python2.7
+lib/python2.7
 develop-eggs
 dist
 eggs
