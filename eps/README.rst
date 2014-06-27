@@ -13,7 +13,7 @@ Give '-T eps' option to blockdiag command line::
 
 Requirements
 =============
-* blockdiag 1.3.0 or later
+* blockdiag 1.4.0 or later
 
 
 License

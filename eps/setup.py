@@ -29,7 +29,7 @@ setup(
     namespace_packages=['blockdiagcontrib'],
     include_package_data=True,
     install_requires=[
-        'blockdiag>=1.3.0',
+        'blockdiag>=1.4.0',
         'setuptools',
     ],
     entry_points="""
