@@ -256,8 +256,7 @@ class EPSImageDraw(base.ImageDraw):
     def image(self, box, url):
         box = self.remap(box)
         try:
-            stream = images.open(url)
-            image = Image.open(stream)
+            image = images.open(url)
 
             # resize image.
             w = min([box.width, image.size[0]])
@@ -286,10 +285,7 @@ class EPSImageDraw(base.ImageDraw):
             for i, rgb in enumerate(image.getdata()):
                 self.write("%x%x%x", *rgb)
         except IOError:
-            stream = None
-        finally:
-            if stream:
-                stream.close()
+            pass
 
     def save(self, filename, size, _format):
         if filename:
