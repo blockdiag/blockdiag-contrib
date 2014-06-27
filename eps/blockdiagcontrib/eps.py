@@ -283,7 +283,7 @@ class EPSImageDraw(base.ImageDraw):
             self.write("{ currentfile imgdata readhexstring pop }")
             self.write("false 3 colorimage")
             for i, rgb in enumerate(image.getdata()):
-                self.write("%x%x%x", *rgb)
+                self.write("%02x%02x%02x", *rgb)
         except IOError:
             pass
 
