@@ -15,6 +15,7 @@
 
 from subprocess import Popen, PIPE
 from shutil import rmtree
+from errno import ENOENT
 from tempfile import NamedTemporaryFile, mkdtemp
 from blockdiag import plugins
 from blockdiag.utils import unquote
@@ -64,26 +65,48 @@ class FormulaImagePlugin(plugins.NodeHandler):
             source.close()
 
             # execute platex
-            args = ['platex', '--interaction=nonstopmode', source.name]
-            latex = Popen(args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
-            stdout, stderr = latex.communicate()
-            if latex.returncode != 0:
-                warning("Fail to convert formula: %s", formula)
-                warning("Reason: %s" % stdout)
+            try:
+                error = None
+                args = ['platex', '--interaction=nonstopmode', source.name]
+                latex = Popen(args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
+                stdout, stderr = latex.communicate()
+                if latex.returncode != 0:
+                    error = stdout
+            except Exception as exc:
+                if isinstance(exc, OSError) and exc.errno == ENOENT:
+                    error = 'platex command not found'
+                else:
+                    error = exc
+
+            if error:
+                warning("Fail to convert formula: %s (reason: %s)" %
+                        (formula, error))
                 return None
 
             # execute dvipng
-            dvifile = source.name.replace('.tex', '.dvi')
-            output = NamedTemporaryFile(suffix='.png')
-            args = ['dvipng', '-gamma', '1.5', '-D', '110', '-T', 'tight',
-                    '-bg', 'Transparent', '-z0', dvifile, '-o', output.name]
-            dvipng = Popen(args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
-            stdout, stderr = dvipng.communicate()
-            if latex.returncode != 0:
-                warning("Fail to convert formula: %s", formula)
-                warning("Reason: %s" % stdout)
-
+            try:
+                error = None
+                dvifile = source.name.replace('.tex', '.dvi')
+                output = NamedTemporaryFile(suffix='.png')
+                args = ['dvipng', '-gamma', '1.5',
+                        '-D', '110', '-T', 'tight',
+                        '-bg', 'Transparent', '-z0', dvifile,
+                        '-o', output.name]
+                dvipng = Popen(args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
+                stdout, stderr = dvipng.communicate()
+                if latex.returncode != 0:
+                    error = stdout
+            except Exception as exc:
                 output.close()
+                if isinstance(exc, OSError) and exc.errno == ENOENT:
+                    error = 'platex command not found'
+                else:
+                    error = exc
+
+            if error:
+                output.close()
+                warning("Fail to convert formula: %s (reason: %s)" %
+                        (formula, error))
                 return None
 
             return output
