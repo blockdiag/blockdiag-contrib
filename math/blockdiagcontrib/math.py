@@ -99,7 +99,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
             except Exception as exc:
                 output.close()
                 if isinstance(exc, OSError) and exc.errno == ENOENT:
-                    error = 'platex command not found'
+                    error = 'dvipng command not found'
                 else:
                     error = exc
 
