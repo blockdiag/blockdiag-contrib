@@ -18,23 +18,20 @@ Example::
 
 see results at http://pythonhosted.org//blockdiagcontrib-math/
 
-Packages
-=========
-
-You can use following packages in Tex:
-
-* `amsmath`
-* `amsthm`
-* `amssymb`
-* `amsfonts`
-* `bm`
-
 Requirements
 ============
 * blockdiag 1.4.2 or later
 * LaTeX
 * dvipng
 
+LaTeX Packages
+--------------
+
+* `amsmath`
+* `amsthm`
+* `amssymb`
+* `amsfonts`
+* `bm`
 
 License
 =======
