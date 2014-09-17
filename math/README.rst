@@ -24,6 +24,15 @@ Requirements
 * LaTeX
 * dvipng
 
+LaTeX Packages
+--------------
+
+* `amsmath`
+* `amsthm`
+* `amssymb`
+* `amsfonts`
+* `bm`
+
 License
 =======
 Apache License 2.0
