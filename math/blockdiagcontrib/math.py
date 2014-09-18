@@ -34,10 +34,9 @@ LATEX_SOURCE = '''
 \\usepackage{bm}
 \\pagestyle{empty}
 \\begin{document}
-\[
-    %s
-\]
-
+\\[
+    {\\Huge %s}
+\\]
 \\end{document}
 '''
 
@@ -126,4 +125,3 @@ def on_cleanup():
 def setup(self, diagram, **kwargs):
     plugins.install_node_handler(FormulaImagePlugin(diagram, **kwargs))
     plugins.install_general_handler('cleanup', on_cleanup)
-    ogle
