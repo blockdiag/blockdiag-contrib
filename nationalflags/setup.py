@@ -23,7 +23,7 @@ setup(
     keywords=['diagram', 'generator'],
     author='Takeshi Komiya',
     author_email='i.tkomiya at gmail.com',
-    url='http://tk0miya.bitbucket.org/blockdiag/build/html/index.html',
+    url='http://bitbucket.org/blockdiag/blockdiag-contrib',
     license='PSL',
     packages=find_packages(),
     package_data={'': ['buildout.cfg']},
