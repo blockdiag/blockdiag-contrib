@@ -35,7 +35,7 @@ LATEX_SOURCE = r'''
 \pagestyle{empty}
 \begin{document}
 \[
-    {\Huge %s}
+    %s
 \]
 \end{document}
 '''
