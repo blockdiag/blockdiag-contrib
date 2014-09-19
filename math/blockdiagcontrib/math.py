@@ -24,20 +24,20 @@ from blockdiag.utils.logging import warning
 formula_images = []
 
 
-LATEX_SOURCE = '''
-\\documentclass[12pt]{article}
-\\usepackage[utf8x]{inputenc}
-\\usepackage{amsmath}
-\\usepackage{amsthm}
-\\usepackage{amssymb}
-\\usepackage{amsfonts}
-\\usepackage{bm}
-\\pagestyle{empty}
-\\begin{document}
-\\[
-    {\\Huge %s}
-\\]
-\\end{document}
+LATEX_SOURCE = r'''
+\documentclass[12pt]{article}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{bm}
+\pagestyle{empty}
+\begin{document}
+\[
+    {\Huge %s}
+\]
+\end{document}
 '''
 
 
