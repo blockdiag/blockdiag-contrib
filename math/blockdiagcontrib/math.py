@@ -72,8 +72,14 @@ class FormulaImagePlugin(plugins.NodeHandler):
                 args = ['platex', '--interaction=nonstopmode', source.name]
                 latex = Popen(args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
                 stdout, stderr = latex.communicate()
+                stdout = stdout.decode('utf-8')
+                stderr = stderr.decode('utf-8')
                 if latex.returncode != 0:
                     error = stdout
+                    warning(
+                        "raise LaTeX Exception:\n\n"
+                        "%s" % error)
+                    return None
             except Exception as exc:
                 if isinstance(exc, OSError) and exc.errno == ENOENT:
                     error = 'platex command not found'
