@@ -13,6 +13,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import os.path
 from subprocess import Popen, PIPE
 from shutil import rmtree
 from errno import ENOENT
@@ -21,8 +22,14 @@ from blockdiag import plugins
 from blockdiag.utils import unquote
 from blockdiag.utils.logging import warning
 
-formula_images = []
+STY_FILENAME = 'diag.sty'
+STY_FILENAME = os.path.abspath(STY_FILENAME)
 
+if os.path.exists(STY_FILENAME):
+    including_package = '\\usepackage{%s}\n' % (
+            os.path.splitext(STY_FILENAME)[0])
+else:
+    including_package = ''
 
 LATEX_SOURCE = r'''
 \documentclass[12pt]{article}
@@ -32,6 +39,9 @@ LATEX_SOURCE = r'''
 \usepackage{amssymb}
 \usepackage{amsfonts}
 \usepackage{bm}
+'''
+LATEX_SOURCE += including_package
+LATEX_SOURCE += r'''
 \pagestyle{empty}
 \begin{document}
 \[
@@ -40,8 +50,11 @@ LATEX_SOURCE = r'''
 \end{document}
 '''
 
+formula_images = []
+
 
 class FormulaImagePlugin(plugins.NodeHandler):
+
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
         if attr.name == 'background' and value.startswith('math://'):
