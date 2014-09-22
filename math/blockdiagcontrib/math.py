@@ -73,10 +73,8 @@ class FormulaImagePlugin(plugins.NodeHandler):
                 latex = Popen(args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
                 stdout, _ = latex.communicate()
                 if latex.returncode != 0:
-                    stdout = stdout.decode('utf-8')
-                    warning(
-                        "raise LaTeX Exception:\n\n"
-                        "%s" % stdout)
+                    warning("raise LaTeX Exception:\n\n%s" %
+                            stdout.decode('utf-8'))
                     return None
             except Exception as exc:
                 if isinstance(exc, OSError) and exc.errno == ENOENT:
@@ -101,10 +99,8 @@ class FormulaImagePlugin(plugins.NodeHandler):
                 dvipng = Popen(args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
                 stdout, _ = dvipng.communicate()
                 if latex.returncode != 0:
-                    stdout = stdout.decode('utf-8')
-                    warning(
-                        "raise dvipng Exception\n\n"
-                        "%s" % stdout)
+                    warning("raise dvipng Exception:\n\n%s" %
+                            stdout.decode('utf-8'))
                     return None
             except Exception as exc:
                 output.close()
