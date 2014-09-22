@@ -107,6 +107,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
                     warning(
                         "raise dvipng Exception\n\n"
                         "%s" % error)
+                    return None
             except Exception as exc:
                 output.close()
                 if isinstance(exc, OSError) and exc.errno == ENOENT:
