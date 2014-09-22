@@ -74,10 +74,9 @@ class FormulaImagePlugin(plugins.NodeHandler):
                 stdout, _ = latex.communicate()
                 if latex.returncode != 0:
                     stdout = stdout.decode('utf-8')
-                    error = stdout
                     warning(
                         "raise LaTeX Exception:\n\n"
-                        "%s" % error)
+                        "%s" % stdout)
                     return None
             except Exception as exc:
                 if isinstance(exc, OSError) and exc.errno == ENOENT:
@@ -103,10 +102,9 @@ class FormulaImagePlugin(plugins.NodeHandler):
                 stdout, _ = dvipng.communicate()
                 if latex.returncode != 0:
                     stdout = stdout.decode('utf-8')
-                    error = stdout
                     warning(
                         "raise dvipng Exception\n\n"
-                        "%s" % error)
+                        "%s" % stdout)
                     return None
             except Exception as exc:
                 output.close()
