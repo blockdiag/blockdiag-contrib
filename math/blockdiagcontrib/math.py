@@ -26,7 +26,7 @@ from blockdiag.utils.logging import warning
 def get_latex_source_sckelton(stylefilename):
     if os.path.exists(stylefilename):
         including_package = '\\usepackage{%s}\n' % (
-                os.path.splitext(stylefilename)[0])
+            os.path.splitext(stylefilename)[0])
     else:
         including_package = ''
 
@@ -54,13 +54,14 @@ formula_images = []
 
 
 class FormulaImagePlugin(plugins.NodeHandler):
+
     def __init__(self, diagram, **kw):
         super(FormulaImagePlugin, self).__init__(diagram, **kw)
         if 'style' in kw:
             stylefilename = kw['style']
         else:
             stylefilename = None
-        
+
         if stylefilename and not stylefilename.endswith('.sty'):
             stylefilename = stylefilename + '.sty'
         self._stylefilename = os.path.abspath(stylefilename)
@@ -93,7 +94,8 @@ class FormulaImagePlugin(plugins.NodeHandler):
             # execute platex
             try:
                 error = None
-                args = ['platex', '--interaction=nonstopmode', source.name]
+                args = ['platex', '--interaction=nonstopmode',
+                        '-shell-restricted', source.name]
                 latex = Popen(args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
                 stdout, _ = latex.communicate()
                 if latex.returncode != 0:
