@@ -34,9 +34,9 @@ LATEX_SOURCE = r'''
 \usepackage{bm}
 \pagestyle{empty}
 \begin{document}
-\[
+\begin{align*}
     %s
-\]
+\end{align*}
 \end{document}
 '''
 
