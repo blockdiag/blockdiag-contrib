@@ -95,9 +95,11 @@ class FormulaImagePlugin(plugins.NodeHandler):
                 error = None
                 args = ['platex', '--interaction=nonstopmode', source.name]
                 latex = Popen(args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
-                stdout, stderr = latex.communicate()
+                stdout, _ = latex.communicate()
                 if latex.returncode != 0:
-                    error = stdout
+                    warning("raise LaTeX Exception:\n\n%s" %
+                            stdout.decode('utf-8'))
+                    return None
             except Exception as exc:
                 if isinstance(exc, OSError) and exc.errno == ENOENT:
                     error = 'platex command not found'
@@ -119,9 +121,11 @@ class FormulaImagePlugin(plugins.NodeHandler):
                         '-bg', 'Transparent', '-z0', dvifile,
                         '-o', output.name]
                 dvipng = Popen(args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
-                stdout, stderr = dvipng.communicate()
+                stdout, _ = dvipng.communicate()
                 if latex.returncode != 0:
-                    error = stdout
+                    warning("raise dvipng Exception:\n\n%s" %
+                            stdout.decode('utf-8'))
+                    return None
             except Exception as exc:
                 output.close()
                 if isinstance(exc, OSError) and exc.errno == ENOENT:
