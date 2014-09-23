@@ -22,7 +22,7 @@ from blockdiag import plugins
 from blockdiag.utils import unquote
 from blockdiag.utils.logging import warning
 
-STY_FILENAME = 'diag.sty'
+STY_FILENAME = 'diag_math.sty'
 STY_FILENAME = os.path.abspath(STY_FILENAME)
 
 if os.path.exists(STY_FILENAME):
