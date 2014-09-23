@@ -22,38 +22,48 @@ from blockdiag import plugins
 from blockdiag.utils import unquote
 from blockdiag.utils.logging import warning
 
-STY_FILENAME = 'diag_math.sty'
-STY_FILENAME = os.path.abspath(STY_FILENAME)
 
-if os.path.exists(STY_FILENAME):
-    including_package = '\\usepackage{%s}\n' % (
-            os.path.splitext(STY_FILENAME)[0])
-else:
-    including_package = ''
+def get_latex_source_sckelton(stylefilename):
+    if os.path.exists(stylefilename):
+        including_package = '\\usepackage{%s}\n' % (
+                os.path.splitext(stylefilename)[0])
+    else:
+        including_package = ''
 
-LATEX_SOURCE = r'''
-\documentclass[12pt]{article}
-\usepackage[utf8x]{inputenc}
-\usepackage{amsmath}
-\usepackage{amsthm}
-\usepackage{amssymb}
-\usepackage{amsfonts}
-\usepackage{bm}
-'''
-LATEX_SOURCE += including_package
-LATEX_SOURCE += r'''
-\pagestyle{empty}
-\begin{document}
-\[
-    {\Huge %s}
-\]
-\end{document}
-'''
+    latex_source = r'''
+    \documentclass[12pt]{article}
+    \usepackage[utf8x]{inputenc}
+    \usepackage{amsmath}
+    \usepackage{amsthm}
+    \usepackage{amssymb}
+    \usepackage{amsfonts}
+    \usepackage{bm}
+    '''
+    latex_source += including_package
+    latex_source += r'''
+    \pagestyle{empty}
+    \begin{document}
+    \[
+        {\Huge %s}
+    \]
+    \end{document}
+    '''
+    return latex_source
 
 formula_images = []
 
 
 class FormulaImagePlugin(plugins.NodeHandler):
+    def __init__(self, diagram, **kw):
+        super(FormulaImagePlugin, self).__init__(diagram, **kw)
+        if 'style' in kw:
+            stylefilename = kw['style']
+        else:
+            stylefilename = None
+        
+        if stylefilename and not stylefilename.endswith('.sty'):
+            stylefilename = stylefilename + '.sty'
+        self._stylefilename = os.path.abspath(stylefilename)
 
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
@@ -76,7 +86,8 @@ class FormulaImagePlugin(plugins.NodeHandler):
             # create source .tex file
             source = NamedTemporaryFile(mode='w+b', suffix='.tex',
                                         dir=tmpdir, delete=False)
-            source.write((LATEX_SOURCE % formula).encode('utf-8'))
+            latex_source = get_latex_source_sckelton(self._stylefilename)
+            source.write((latex_source % formula).encode('utf-8'))
             source.close()
 
             # execute platex
