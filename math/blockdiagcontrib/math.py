@@ -44,13 +44,17 @@ LATEX_SOURCE = r'''
 class FormulaImagePlugin(plugins.NodeHandler):
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
-        if attr.name == 'background' and value.startswith('math://'):
+        if attr.name == 'label' and value.startswith('math://'):
+            if node.background:
+                warning("Don't use both of math mode and background")
             image = self.create_formula_image(value.replace('math://', ''))
             if image:
                 formula_images.append(image)
                 node.background = image
             else:
                 node.background = None
+
+            node.label = ""
 
             return False
         else:
