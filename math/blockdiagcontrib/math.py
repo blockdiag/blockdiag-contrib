@@ -43,9 +43,9 @@ def get_latex_source(formula, stylefilename):
     latex_source += r'''
     \pagestyle{empty}
     \begin{document}
-    \[
+    \begin{align*}
         %s
-    \]
+    \end{align*}
     \end{document}
     ''' % formula
     return latex_source
