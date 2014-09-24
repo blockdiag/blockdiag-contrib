@@ -23,8 +23,8 @@ from blockdiag.utils import unquote
 from blockdiag.utils.logging import warning
 
 
-def get_latex_source_sckelton(stylefilename):
-    if os.path.exists(stylefilename):
+def get_latex_source(formula, stylefilename):
+    if stylefilename and os.path.exists(stylefilename):
         including_package = '\\usepackage{%s}\n' % (
             os.path.splitext(stylefilename)[0])
     else:
@@ -44,10 +44,10 @@ def get_latex_source_sckelton(stylefilename):
     \pagestyle{empty}
     \begin{document}
     \[
-        {\Huge %s}
+        %s
     \]
     \end{document}
-    '''
+    ''' % formula
     return latex_source
 
 formula_images = []
@@ -57,14 +57,15 @@ class FormulaImagePlugin(plugins.NodeHandler):
 
     def __init__(self, diagram, **kw):
         super(FormulaImagePlugin, self).__init__(diagram, **kw)
-        if 'style' in kw:
-            stylefilename = kw['style']
-        else:
-            stylefilename = None
+        stylefilename = kw.get('style')
 
-        if stylefilename and not stylefilename.endswith('.sty'):
+        if 'style' in kw and not stylefilename.endswith('.sty'):
             stylefilename = stylefilename + '.sty'
-        self._stylefilename = os.path.abspath(stylefilename)
+
+        if stylefilename:
+            self._stylefilename = os.path.abspath(stylefilename)
+        else:
+            self._stylefilename = None
 
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
@@ -87,15 +88,15 @@ class FormulaImagePlugin(plugins.NodeHandler):
             # create source .tex file
             source = NamedTemporaryFile(mode='w+b', suffix='.tex',
                                         dir=tmpdir, delete=False)
-            latex_source = get_latex_source_sckelton(self._stylefilename)
-            source.write((latex_source % formula).encode('utf-8'))
+            latex_source = get_latex_source(formula, self._stylefilename)
+            source.write((latex_source).encode('utf-8'))
             source.close()
 
             # execute platex
             try:
                 error = None
                 args = ['platex', '--interaction=nonstopmode',
-                        '-shell-restricted', source.name]
+                        '-no-shell-escape', source.name]
                 latex = Popen(args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
                 stdout, _ = latex.communicate()
                 if latex.returncode != 0:
