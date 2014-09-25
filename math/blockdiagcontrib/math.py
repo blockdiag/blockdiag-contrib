@@ -57,6 +57,15 @@ class FormulaImagePlugin(plugins.NodeHandler):
             node.label = ""
 
             return False
+        elif attr.name == 'background' and value.startswith('math://'):
+            image = self.create_formula_image(value.replace('math://', ''))
+            if image:
+                formula_images.append(image)
+                node.background = image
+            else:
+                node.background = None
+
+            return False
         else:
             return True
 
