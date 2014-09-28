@@ -120,6 +120,16 @@ class FormulaImagePlugin(plugins.NodeHandler):
         finally:
             rmtree(tmpdir)
 
+    def on_created(self, node):
+        if node.background and (
+                node.background.startswith('math://') and
+                getattr(node, 'resizable', None) is None):
+            node.resizable = False
+
+    def on_attr_changed(self, node, attr):
+        if attr.name == 'background' and attr.startswith('math://'):
+            node.resizable = False
+
 
 def on_cleanup():
     for image in formula_images[:]:
