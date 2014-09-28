@@ -17,6 +17,7 @@ from subprocess import Popen, PIPE
 from shutil import rmtree
 from errno import ENOENT
 from tempfile import NamedTemporaryFile, mkdtemp
+from PIL import Image
 from blockdiag import plugins
 from blockdiag.utils import unquote
 from blockdiag.utils.logging import warning
@@ -40,12 +41,24 @@ LATEX_SOURCE = r'''
 \end{document}
 '''
 
+def get_image_size(image_filename):
+    image = Image.open(image_filename)
+    size = image.size
+    image.close()
+    return size
+
 
 class FormulaImagePlugin(plugins.NodeHandler):
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
         if attr.name == 'background' and value.startswith('math://'):
             image = self.create_formula_image(value.replace('math://', ''))
+            ### if node.rezable is True
+            if image and node.resizable:
+                width, height = get_image_size(image.name)
+                node.width = width
+                node.height = height
+
             if image:
                 formula_images.append(image)
                 node.background = image
@@ -121,15 +134,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
             rmtree(tmpdir)
 
     def on_created(self, node):
-        if node.background and (
-                node.background.startswith('math://') and
-                getattr(node, 'resizable', None) is None):
-            node.resizable = False
-
-    def on_attr_changed(self, node, attr):
-        if attr.name == 'background' and attr.startswith('math://'):
-            node.resizable = False
-
+        node.resizable = False
 
 def on_cleanup():
     for image in formula_images[:]:
