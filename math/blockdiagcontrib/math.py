@@ -60,7 +60,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
             return False
         elif attr.name == 'background' and value.startswith('math://'):
             if node.label:
-                warning("Don't use both of math mode and background")
+                warning("Don't use both of math mode and label")
                 return None
             image = self.create_formula_image(value.replace('math://', ''))
             if image:
