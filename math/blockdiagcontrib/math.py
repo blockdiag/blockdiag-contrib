@@ -47,6 +47,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
         if attr.name == 'label' and value.startswith('math://'):
             if node.background:
                 warning("Don't use both of math mode and background")
+                return None
             image = self.create_formula_image(value.replace('math://', ''))
             if image:
                 formula_images.append(image)
@@ -58,6 +59,9 @@ class FormulaImagePlugin(plugins.NodeHandler):
 
             return False
         elif attr.name == 'background' and value.startswith('math://'):
+            if node.label:
+                warning("Don't use both of math mode and background")
+                return None
             image = self.create_formula_image(value.replace('math://', ''))
             if image:
                 formula_images.append(image)
