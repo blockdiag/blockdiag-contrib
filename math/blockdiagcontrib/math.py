@@ -16,11 +16,13 @@
 from subprocess import Popen, PIPE
 from shutil import rmtree
 from errno import ENOENT
+from re import compile as re_compile
 from tempfile import NamedTemporaryFile, mkdtemp
 from blockdiag import plugins
 from blockdiag.utils import unquote
 from blockdiag.utils.logging import warning
 
+DEFAULT_ENVIRONMENT = 'align*'
 formula_images = []
 
 def get_latex_source(formula, env):
@@ -44,24 +46,32 @@ def get_latex_source(formula, env):
 class FormulaImagePlugin(plugins.NodeHandler):
     def __init__(self, diagram, **kw):
         super(FormulaImagePlugin, self).__init__(diagram, **kw)
-        self._env = kw.get('env', 'align*')
+        self._env = kw.get('env', DEFAULT_ENVIRONMENT)
 
 
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
-        if attr.name == 'background' and value.startswith('math://'):
-            image = self.create_formula_image(value.replace('math://', ''))
-            if image:
-                formula_images.append(image)
-                node.background = image
-            else:
-                node.background = None
-
-            return False
-        else:
+        math_pat = re_compile(r'^math(\+[^/:]*)?://')
+        math_match = math_pat.search(value)
+        if attr.name != 'background' or not math_match:
             return True
 
-    def create_formula_image(self, formula):
+        if math_match.groups()[0]:
+            env = math_match.groups()[0][1:]
+        elif self._env:
+            env = self._env
+
+        _, end = math_match.span()
+        image = self.create_formula_image(value[end:], env)
+        if image:
+            formula_images.append(image)
+            node.background = image
+        else:
+            node.background = None
+
+        return False
+
+    def create_formula_image(self, formula, env):
         try:
             tmpdir = mkdtemp()
             formula = formula.strip()
@@ -69,9 +79,8 @@ class FormulaImagePlugin(plugins.NodeHandler):
             # create source .tex file
             source = NamedTemporaryFile(mode='w+b', suffix='.tex',
                                         dir=tmpdir, delete=False)
-            latex_source = get_latex_source(formula, self._env).encode('utf-8')
+            latex_source = get_latex_source(formula, env).encode('utf-8')
             source.write(latex_source)
-            # source.write((LATEX_SOURCE % formula).encode('utf-8'))
             source.close()
 
             # execute platex
