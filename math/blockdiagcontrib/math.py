@@ -63,7 +63,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
 
         if math_match.groups()[0]:
             env = math_match.groups()[0][1:]
-        elif self._env:
+        else:
             env = self._env
 
         _, end = math_match.span()
