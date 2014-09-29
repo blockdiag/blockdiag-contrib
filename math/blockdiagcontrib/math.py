@@ -52,7 +52,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
 
-        ### for performance of regrex
+        # for performance of regrex
         if attr.name != 'background' or not value.startswith('math'):
             return True
 
