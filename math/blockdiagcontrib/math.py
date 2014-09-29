@@ -23,25 +23,30 @@ from blockdiag.utils.logging import warning
 
 formula_images = []
 
-
-LATEX_SOURCE = r'''
-\documentclass[12pt]{article}
-\usepackage[utf8x]{inputenc}
-\usepackage{amsmath}
-\usepackage{amsthm}
-\usepackage{amssymb}
-\usepackage{amsfonts}
-\usepackage{bm}
-\pagestyle{empty}
-\begin{document}
-\begin{align*}
-    %s
-\end{align*}
-\end{document}
-'''
+def get_latex_source(formula, env):
+    return r'''
+    \documentclass[12pt]{article}
+    \usepackage[utf8x]{inputenc}
+    \usepackage{amsmath}
+    \usepackage{amsthm}
+    \usepackage{amssymb}
+    \usepackage{amsfonts}
+    \usepackage{bm}
+    \pagestyle{empty}
+    \begin{document}
+    \begin{%(env)s}
+        %(formula)s
+    \end{%(env)s}
+    \end{document}
+    ''' %{'formula':formula, 'env':env}
 
 
 class FormulaImagePlugin(plugins.NodeHandler):
+    def __init__(self, diagram, **kw):
+        super(FormulaImagePlugin, self).__init__(diagram, **kw)
+        self._env = kw.get('env', 'align*')
+
+
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
         if attr.name == 'background' and value.startswith('math://'):
@@ -64,7 +69,9 @@ class FormulaImagePlugin(plugins.NodeHandler):
             # create source .tex file
             source = NamedTemporaryFile(mode='w+b', suffix='.tex',
                                         dir=tmpdir, delete=False)
-            source.write((LATEX_SOURCE % formula).encode('utf-8'))
+            latex_source = get_latex_source(formula, self._env).encode('utf-8')
+            source.write(latex_source)
+            # source.write((LATEX_SOURCE % formula).encode('utf-8'))
             source.close()
 
             # execute platex
