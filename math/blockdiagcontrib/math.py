@@ -51,9 +51,14 @@ class FormulaImagePlugin(plugins.NodeHandler):
 
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
+
+        ### for performance of regrex
+        if attr.name != 'background' or not value.startswith('math'):
+            return True
+
         math_pat = re_compile(r'^math(\+[^/:]*)?://')
         math_match = math_pat.search(value)
-        if attr.name != 'background' or not math_match:
+        if not math_match:
             return True
 
         if math_match.groups()[0]:
