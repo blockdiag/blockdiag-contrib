@@ -25,6 +25,7 @@ from blockdiag.utils.logging import warning
 DEFAULT_ENVIRONMENT = 'align*'
 formula_images = []
 
+
 def get_latex_source(formula, env):
     return r'''
     \documentclass[12pt]{article}
@@ -40,14 +41,13 @@ def get_latex_source(formula, env):
         %(formula)s
     \end{%(env)s}
     \end{document}
-    ''' %{'formula':formula, 'env':env}
+    ''' % {'formula': formula, 'env': env}
 
 
 class FormulaImagePlugin(plugins.NodeHandler):
     def __init__(self, diagram, **kw):
         super(FormulaImagePlugin, self).__init__(diagram, **kw)
         self._env = kw.get('env', DEFAULT_ENVIRONMENT)
-
 
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
