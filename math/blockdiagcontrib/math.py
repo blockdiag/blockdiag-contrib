@@ -55,7 +55,6 @@ class FormulaImagePlugin(plugins.NodeHandler):
         value = unquote(attr.value)
         if attr.name == 'background' and value.startswith('math://'):
             image = self.create_formula_image(value.replace('math://', ''))
-            # if node.rezable is True
             if node.resizable not in (None, True, False):
                 warning('resizable is True or False')
                 return None
