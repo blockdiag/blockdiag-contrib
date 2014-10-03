@@ -41,6 +41,7 @@ LATEX_SOURCE = r'''
 \end{document}
 '''
 
+
 def get_image_size(image_filename):
     image = Image.open(image_filename)
     size = image.size
@@ -49,12 +50,13 @@ def get_image_size(image_filename):
 
 
 class FormulaImagePlugin(plugins.NodeHandler):
+
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
         if attr.name == 'background' and value.startswith('math://'):
             image = self.create_formula_image(value.replace('math://', ''))
-            ### if node.rezable is True
-            if not node.resizable in (None, 'True', 'False', True, False):
+            # if node.rezable is True
+            if node.resizable not in (None, 'True', 'False', True, False):
                 warning('resizable is True or False')
                 return None
 
@@ -144,7 +146,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
             node.resizable = False
         else:
             node.resizable = bool(node.resizable)
-        
+
         if node.resizable:
             width, height = get_image_size(node.background.name)
             node.width = width
