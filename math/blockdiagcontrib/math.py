@@ -49,9 +49,6 @@ def get_image_size(image_filename):
 
 
 class FormulaImagePlugin(plugins.NodeHandler):
-    def __init__(self, diagram, **kw):
-        super(FormulaImagePlugin, self).__init__(diagram, **kw)
-
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
         if attr.name == 'background' and value.startswith('math://'):
