@@ -56,7 +56,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
         if attr.name == 'background' and value.startswith('math://'):
             image = self.create_formula_image(value.replace('math://', ''))
             # if node.rezable is True
-            if node.resizable not in (None, 'True', 'False', True, False):
+            if node.resizable not in (None, True, False):
                 warning('resizable is True or False')
                 return None
 
@@ -138,6 +138,9 @@ class FormulaImagePlugin(plugins.NodeHandler):
         node.resizable = False
 
     def on_build_finished(self, node):
+        if node.resizable not in (True, 'True', False, 'False', None):
+            warning('input boolean or empty as resizable option')
+            return 
         if node.resizable == 'True':
             node.resizable = True
         elif node.resizable == 'False':
