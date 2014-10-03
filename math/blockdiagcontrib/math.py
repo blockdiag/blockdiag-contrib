@@ -128,7 +128,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
         node.resizable = False
 
     def on_build_finished(self, node):
-        if node.resizable not in (True, 'True', False, 'False', None):
+        if node.resizable not in (True, 'True', False, 'False'):
             warning('input boolean or empty as resizable option')
             return 
 
