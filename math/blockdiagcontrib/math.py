@@ -44,7 +44,7 @@ LATEX_SOURCE = r'''
 
 
 def get_latex_source(formula, env):
-    return LATEX_SOURCE % {'formula': formula, 'formula_env': env}
+    return LATEX_SOURCE % {'formula': formula.strip(), 'formula_env': env}
 
 
 class FormulaImagePlugin(plugins.NodeHandler):
