@@ -16,7 +16,7 @@
 from subprocess import Popen, PIPE
 from shutil import rmtree
 from errno import ENOENT
-from re import compile as re_compile
+from re import search as re_search
 from tempfile import NamedTemporaryFile, mkdtemp
 from blockdiag import plugins
 from blockdiag.utils import unquote
@@ -56,8 +56,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
         if attr.name != 'background' or not value.startswith('math'):
             return True
 
-        math_pat = re_compile(r'^math(\+[^/:]*)?://')
-        math_match = math_pat.search(value)
+        math_match = re_search(r'^math(\+[^/:]*)?://', value)
         if not math_match:
             return True
 
