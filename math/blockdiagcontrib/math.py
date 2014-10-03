@@ -20,6 +20,7 @@ from tempfile import NamedTemporaryFile, mkdtemp
 from PIL import Image
 from blockdiag import plugins
 from blockdiag.utils import unquote
+from blockdiag.utils.images import get_image_size
 from blockdiag.utils.logging import warning
 
 formula_images = []
@@ -40,13 +41,6 @@ LATEX_SOURCE = r'''
 \end{align*}
 \end{document}
 '''
-
-
-def get_image_size(image_filename):
-    image = Image.open(image_filename)
-    size = image.size
-    image.close()
-    return size
 
 
 class FormulaImagePlugin(plugins.NodeHandler):
