@@ -49,6 +49,9 @@ def get_image_size(image_filename):
 
 
 class FormulaImagePlugin(plugins.NodeHandler):
+    def __init__(self, diagram, **kw):
+        super(FormulaImagePlugin, self).__init__(diagram, **kw)
+
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
         if attr.name == 'background' and value.startswith('math://'):
@@ -57,18 +60,6 @@ class FormulaImagePlugin(plugins.NodeHandler):
             if not node.resizable in (None, 'True', 'False', True, False):
                 warning('resizable is True or False')
                 return None
-
-            if node.resizable == 'True':
-                node.resizable = True
-            elif node.resizable == 'False':
-                node.resizable = False
-            elif node.resizable is None:
-                node.resizable = False
-
-            if image and node.resizable:
-                width, height = get_image_size(image.name)
-                node.width = width
-                node.height = height
 
             if image:
                 formula_images.append(image)
@@ -146,6 +137,22 @@ class FormulaImagePlugin(plugins.NodeHandler):
 
     def on_created(self, node):
         node.resizable = False
+
+    def on_build_finished(self, node):
+        if node.resizable == 'True':
+            node.resizable = True
+        elif node.resizable == 'False':
+            node.resizable = False
+        elif node.resizable is None:
+            node.resizable = False
+        else:
+            node.resizable = bool(node.resizable)
+        
+        if node.resizable:
+            width, height = get_image_size(node.background.name)
+            node.width = width
+            node.height = height
+
 
 def on_cleanup():
     for image in formula_images[:]:
