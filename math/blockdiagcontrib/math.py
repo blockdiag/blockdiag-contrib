@@ -141,6 +141,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
         if node.resizable not in (True, 'True', False, 'False', None):
             warning('input boolean or empty as resizable option')
             return 
+
         if node.resizable == 'True':
             node.resizable = True
         elif node.resizable == 'False':
