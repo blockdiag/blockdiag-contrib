@@ -13,10 +13,10 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import re
 from subprocess import Popen, PIPE
 from shutil import rmtree
 from errno import ENOENT
-from re import search as re_search
 from tempfile import NamedTemporaryFile, mkdtemp
 from blockdiag import plugins
 from blockdiag.utils import unquote
@@ -26,65 +26,69 @@ DEFAULT_ENVIRONMENT = 'align*'
 formula_images = []
 
 
+LATEX_SOURCE = r'''
+\documentclass[12pt]{article}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{bm}
+\pagestyle{empty}
+\begin{document}
+\begin{%(formula_env)s}
+    %(formula)s
+\end{%(formula_env)s}
+\end{document}
+'''.encode('utf-8')
+
+
 def get_latex_source(formula, env):
-    return r'''
-    \documentclass[12pt]{article}
-    \usepackage[utf8x]{inputenc}
-    \usepackage{amsmath}
-    \usepackage{amsthm}
-    \usepackage{amssymb}
-    \usepackage{amsfonts}
-    \usepackage{bm}
-    \pagestyle{empty}
-    \begin{document}
-    \begin{%(env)s}
-        %(formula)s
-    \end{%(env)s}
-    \end{document}
-    ''' % {'formula': formula, 'env': env}
+    return LATEX_SOURCE % {'formula': formula, 'formula_env': env}
 
 
 class FormulaImagePlugin(plugins.NodeHandler):
-    def __init__(self, diagram, **kw):
-        super(FormulaImagePlugin, self).__init__(diagram, **kw)
-        self._env = kw.get('env', DEFAULT_ENVIRONMENT)
+    def __init__(self, diagram, **kwargs):
+        super(FormulaImagePlugin, self).__init__(diagram, **kwargs)
+        self.default_formula_env = kwargs.get('env', DEFAULT_ENVIRONMENT)
+
+    def get_formula_env(self, uri):
+        match = re.search(r'^math(?:\+([^/:]+))?://', uri)
+        if not match:
+            return True
+        elif match.group(1):
+            return match.group(1)
+        else:
+            return self.default_formula_env
 
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
 
-        # for performance of regrex
-        if attr.name != 'background' or not value.startswith('math'):
+        if attr.name == 'background':
+            formula_env = self.get_formula_env(value)
+            if formula_env is None:  # not math uri
+                return True
+
+            formula = value.split('://', 1)[1]
+            image = self.create_formula_image(formula, formula_env)
+            if image:
+                formula_images.append(image)
+                node.background = image
+            else:
+                node.background = None
+
+            return False
+        else:
             return True
 
-        math_match = re_search(r'^math(\+[^/:]*)?://', value)
-        if not math_match:
-            return True
-
-        if math_match.groups()[0]:
-            env = math_match.groups()[0][1:]
-        else:
-            env = self._env
-
-        _, end = math_match.span()
-        image = self.create_formula_image(value[end:], env)
-        if image:
-            formula_images.append(image)
-            node.background = image
-        else:
-            node.background = None
-
-        return False
-
-    def create_formula_image(self, formula, env):
+    def create_formula_image(self, formula, formula_env):
         try:
             tmpdir = mkdtemp()
-            formula = formula.strip()
 
             # create source .tex file
             source = NamedTemporaryFile(mode='w+b', suffix='.tex',
                                         dir=tmpdir, delete=False)
-            latex_source = get_latex_source(formula, env).encode('utf-8')
-            source.write(latex_source)
+            source.write(get_latex_source(formula, formula_env))
             source.close()
 
             # execute platex
