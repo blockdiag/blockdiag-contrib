@@ -141,7 +141,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
         else:
             node.resizable = bool(node.resizable)
 
-        if node.resizable:
+        if node.resizable and node.background:
             width, height = get_image_size(node.background.name)
             node.width = width
             node.height = height
