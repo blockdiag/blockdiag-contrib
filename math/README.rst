@@ -16,16 +16,6 @@ Example::
      A -> B;
    }
 
-And the following code has mean same as an above code.
-
-Example::
-
-   blockdiag {
-     plugin math;
-     A [label="", background = "math://\int_{0}^{\infty} f(x)dx"];
-     A -> B;
-   }
-
 see results at http://pythonhosted.org//blockdiagcontrib-math/
 
 Requirements
