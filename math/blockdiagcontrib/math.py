@@ -13,6 +13,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import re
 from subprocess import Popen, PIPE
 from shutil import rmtree
 from errno import ENOENT
@@ -23,6 +24,7 @@ from blockdiag.utils import unquote
 from blockdiag.utils.images import get_image_size
 from blockdiag.utils.logging import warning
 
+DEFAULT_ENVIRONMENT = 'align*'
 formula_images = []
 
 
@@ -36,19 +38,40 @@ LATEX_SOURCE = r'''
 \usepackage{bm}
 \pagestyle{empty}
 \begin{document}
-\begin{align*}
-    %s
-\end{align*}
+\begin{%(formula_env)s}
+    %(formula)s
+\end{%(formula_env)s}
 \end{document}
 '''
 
 
+def get_latex_source(formula, env):
+    return LATEX_SOURCE % {'formula': formula.strip(), 'formula_env': env}
+
+
 class FormulaImagePlugin(plugins.NodeHandler):
+    def __init__(self, diagram, **kwargs):
+        super(FormulaImagePlugin, self).__init__(diagram, **kwargs)
+        self.default_formula_env = kwargs.get('env', DEFAULT_ENVIRONMENT)
+
+    def get_formula_env(self, uri):
+        match = re.search(r'^math(?:\+([^/:]+))?://', uri)
+        if not match:
+            return None
+        elif match.group(1):
+            return match.group(1)
+        else:
+            return self.default_formula_env
 
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
         if attr.name == 'background' and value.startswith('math://'):
-            image = self.create_formula_image(value.replace('math://', ''))
+            formula_env = self.get_formula_env(value)
+            if formula_env is None:  # not math uri
+                return True
+
+            formula = value.split('://', 1)[1]
+            image = self.create_formula_image(formula, formula_env)
 
             if image:
                 formula_images.append(image)
@@ -60,7 +83,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
         else:
             return True
 
-    def create_formula_image(self, formula):
+    def create_formula_image(self, formula, formula_env):
         try:
             tmpdir = mkdtemp()
             formula = formula.strip()
@@ -68,7 +91,8 @@ class FormulaImagePlugin(plugins.NodeHandler):
             # create source .tex file
             source = NamedTemporaryFile(mode='w+b', suffix='.tex',
                                         dir=tmpdir, delete=False)
-            source.write((LATEX_SOURCE % formula).encode('utf-8'))
+            latex_source = get_latex_source(formula, formula_env)
+            source.write(latex_source.encode('utf-8'))
             source.close()
 
             # execute platex
