@@ -2,7 +2,7 @@
 import sys
 from setuptools import setup, find_packages
 
-version = '0.2.0'
+version = '0.2.1'
 requires = ['blockdiag >= 1.4.2']
 classifiers = [
     "Development Status :: 4 - Beta",

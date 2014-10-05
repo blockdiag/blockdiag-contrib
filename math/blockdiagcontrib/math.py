@@ -14,6 +14,7 @@
 #  limitations under the License.
 
 import re
+import os.path
 from subprocess import Popen, PIPE
 from shutil import rmtree
 from errno import ENOENT
@@ -25,8 +26,6 @@ from blockdiag.utils.images import get_image_size
 from blockdiag.utils.logging import warning
 
 DEFAULT_ENVIRONMENT = 'align*'
-formula_images = []
-
 
 LATEX_SOURCE = r'''
 \documentclass[12pt]{article}
@@ -36,6 +35,7 @@ LATEX_SOURCE = r'''
 \usepackage{amssymb}
 \usepackage{amsfonts}
 \usepackage{bm}
+%(usepackage)s
 \pagestyle{empty}
 \begin{document}
 \begin{%(formula_env)s}
@@ -44,15 +44,33 @@ LATEX_SOURCE = r'''
 \end{document}
 '''
 
+formula_images = []
 
-def get_latex_source(formula, env):
-    return LATEX_SOURCE % {'formula': formula.strip(), 'formula_env': env}
+
+def get_latex_source(formula, env, stylepackage):
+    if stylepackage:
+        usepackage = '\\usepackage{%s}\n' % stylepackage
+    else:
+        usepackage = ''
+
+    return LATEX_SOURCE % {'formula': formula.strip(),
+                           'formula_env': env,
+                           'usepackage': usepackage}
 
 
 class FormulaImagePlugin(plugins.NodeHandler):
     def __init__(self, diagram, **kwargs):
         super(FormulaImagePlugin, self).__init__(diagram, **kwargs)
         self.default_formula_env = kwargs.get('env', DEFAULT_ENVIRONMENT)
+        self.stylepackage = None
+
+        stylefile = kwargs.get('style')
+        if stylefile:
+            if not os.path.exists(stylefile):
+                warning('style file not found: %s' % stylefile)
+            else:
+                stylefile = os.path.abspath(stylefile)
+                self.stylepackage = os.path.splitext(stylefile)[0]
 
     def get_formula_env(self, uri):
         match = re.search(r'^math(?:\+([^/:]+))?://', uri)
@@ -65,7 +83,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
 
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
-        if attr.name == 'background' and value.startswith('math://'):
+        if attr.name == 'background':
             formula_env = self.get_formula_env(value)
             if formula_env is None:  # not math uri
                 return True
@@ -91,14 +109,16 @@ class FormulaImagePlugin(plugins.NodeHandler):
             # create source .tex file
             source = NamedTemporaryFile(mode='w+b', suffix='.tex',
                                         dir=tmpdir, delete=False)
-            latex_source = get_latex_source(formula, formula_env)
+            latex_source = get_latex_source(formula, formula_env,
+                                            self.stylepackage)
             source.write(latex_source.encode('utf-8'))
             source.close()
 
             # execute platex
             try:
-                error = None
-                args = ['platex', '--interaction=nonstopmode', source.name]
+                # `-no-shell-escape` blocks to invoke any commands
+                args = ['platex', '--interaction=nonstopmode',
+                        '-no-shell-escape', source.name]
                 latex = Popen(args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
                 stdout, _ = latex.communicate()
                 if latex.returncode != 0:
@@ -111,14 +131,12 @@ class FormulaImagePlugin(plugins.NodeHandler):
                 else:
                     error = exc
 
-            if error:
                 warning("Fail to convert formula: %s (reason: %s)" %
                         (formula, error))
                 return None
 
             # execute dvipng
             try:
-                error = None
                 dvifile = source.name.replace('.tex', '.dvi')
                 output = NamedTemporaryFile(suffix='.png')
                 args = ['dvipng', '-gamma', '1.5',
@@ -138,8 +156,6 @@ class FormulaImagePlugin(plugins.NodeHandler):
                 else:
                     error = exc
 
-            if error:
-                output.close()
                 warning("Fail to convert formula: %s (reason: %s)" %
                         (formula, error))
                 return None
