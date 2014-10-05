@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 from setuptools import setup, find_packages
 
 version = '0.2.0'
@@ -18,6 +19,10 @@ classifiers = [
     "Topic :: Text Processing :: Markup",
 ]
 
+tests_require = []
+if sys.version_info < (2, 7):
+    tests_require.append('unittest2')
+
 setup(
     name='blockdiagcontrib-math',
     version=version,
@@ -32,6 +37,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=requires,
+    tests_require=tests_require,
     entry_points="""
        [blockdiag_plugins]
        math = blockdiagcontrib.math
