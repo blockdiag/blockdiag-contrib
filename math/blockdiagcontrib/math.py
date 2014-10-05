@@ -62,6 +62,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
         self.default_formula_env = kwargs.get('env', DEFAULT_ENVIRONMENT)
         self.stylepackage = None
 
+
         stylefile = kwargs.get('style')
         if stylefile:
             if not os.path.exists(stylefile):
@@ -81,9 +82,29 @@ class FormulaImagePlugin(plugins.NodeHandler):
 
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
-        if attr.name == 'background':
+        if attr.name == 'label':
             formula_env = self.get_formula_env(value)
             if formula_env is None:  # not math uri
+                return True
+
+            if node.background:
+                warning("Don't use both of math mode and background")
+                return None
+            
+            formula = value.split('://', 1)[1]
+            image = self.create_formula_image(formula, formula_env)
+            if image:
+                formula_images.append(image)
+                node.background = image
+            else:
+                node.background = None
+
+            node.label = ""
+
+            return False
+        elif attr.name == 'background':
+            formula_env = self.get_formula_env(value)
+            if formula_env is None: # not math uri
                 return True
 
             formula = value.split('://', 1)[1]
