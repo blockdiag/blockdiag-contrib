@@ -40,7 +40,7 @@ LATEX_SOURCE = r'''
     %(formula)s
 \end{%(formula_env)s}
 \end{document}
-'''.encode('utf-8')
+'''
 
 
 def get_latex_source(formula, env):
@@ -88,7 +88,8 @@ class FormulaImagePlugin(plugins.NodeHandler):
             # create source .tex file
             source = NamedTemporaryFile(mode='w+b', suffix='.tex',
                                         dir=tmpdir, delete=False)
-            source.write(get_latex_source(formula, formula_env))
+            latex_source = get_latex_source(formula, formula_env)
+            source.write(latex_source.encode('utf-8'))
             source.close()
 
             # execute platex
