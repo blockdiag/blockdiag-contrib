@@ -40,7 +40,7 @@ LATEX_SOURCE = r'''
     %(formula)s
 \end{%(formula_env)s}
 \end{document}
-'''
+'''.encode('utf-8')
 
 
 def get_latex_source(formula, env):
