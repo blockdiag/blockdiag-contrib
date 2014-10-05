@@ -116,7 +116,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
                 args = ['platex', '--interaction=nonstopmode',
                         '-no-shell-escape', source.name]
                 # -no-shell-escape option: for restraint of destructive
-                    # operation by style file
+                # operation by style file
                 latex = Popen(args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
                 stdout, _ = latex.communicate()
                 if latex.returncode != 0:
