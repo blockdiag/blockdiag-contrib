@@ -13,6 +13,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import re
 import os.path
 from subprocess import Popen, PIPE
 from shutil import rmtree
@@ -22,44 +23,49 @@ from blockdiag import plugins
 from blockdiag.utils import unquote
 from blockdiag.utils.logging import warning
 
+DEFAULT_ENVIRONMENT = 'align*'
 
-def get_latex_source(formula, stylefilename):
+LATEX_SOURCE = r'''
+\documentclass[12pt]{article}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{bm}
+%(package)s
+\pagestyle{empty}
+\begin{document}
+\begin{%(formula_env)s}
+    %(formula)s
+\end{%(formula_env)s}
+\end{document}
+'''
+
+
+def get_latex_source(formula, env, stylefilename):
     if stylefilename and os.path.exists(stylefilename):
         including_package = '\\usepackage{%s}\n' % (
             os.path.splitext(stylefilename)[0])
     else:
         including_package = ''
 
-    latex_source = r'''
-    \documentclass[12pt]{article}
-    \usepackage[utf8x]{inputenc}
-    \usepackage{amsmath}
-    \usepackage{amsthm}
-    \usepackage{amssymb}
-    \usepackage{amsfonts}
-    \usepackage{bm}
-    '''
-    latex_source += including_package
-    latex_source += r'''
-    \pagestyle{empty}
-    \begin{document}
-    \begin{align*}
-        %s
-    \end{align*}
-    \end{document}
-    ''' % formula
-    return latex_source
+    return LATEX_SOURCE % {
+              'formula': formula.strip(),
+              'formula_env': env,
+              'package': including_package}
 
 formula_images = []
 
 
 class FormulaImagePlugin(plugins.NodeHandler):
 
-    def __init__(self, diagram, **kw):
-        super(FormulaImagePlugin, self).__init__(diagram, **kw)
-        stylefilename = kw.get('style')
+    def __init__(self, diagram, **kwargs):
+        super(FormulaImagePlugin, self).__init__(diagram, **kwargs)
+        self.default_formula_env = kwargs.get('env', DEFAULT_ENVIRONMENT)
+        stylefilename = kwargs.get('style')
 
-        if 'style' in kw and not stylefilename.endswith('.sty'):
+        if 'style' in kwargs and not stylefilename.endswith('.sty'):
             stylefilename = stylefilename + '.sty'
 
         if stylefilename:
@@ -67,10 +73,24 @@ class FormulaImagePlugin(plugins.NodeHandler):
         else:
             self._stylefilename = None
 
+    def get_formula_env(self, uri):
+        match = re.search(r'^math(?:\+([^/:]+))?://', uri)
+        if not match:
+            return None
+        elif match.group(1):
+            return match.group(1)
+        else:
+            return self.default_formula_env
+
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
-        if attr.name == 'background' and value.startswith('math://'):
-            image = self.create_formula_image(value.replace('math://', ''))
+        if attr.name == 'background':
+            formula_env = self.get_formula_env(value)
+            if formula_env is None:  # not math uri
+                return True
+
+            formula = value.split('://', 1)[1]
+            image = self.create_formula_image(formula, formula_env)
             if image:
                 formula_images.append(image)
                 node.background = image
@@ -81,15 +101,15 @@ class FormulaImagePlugin(plugins.NodeHandler):
         else:
             return True
 
-    def create_formula_image(self, formula):
+    def create_formula_image(self, formula, formula_env):
         try:
             tmpdir = mkdtemp()
 
             # create source .tex file
             source = NamedTemporaryFile(mode='w+b', suffix='.tex',
                                         dir=tmpdir, delete=False)
-            latex_source = get_latex_source(formula, self._stylefilename)
-            source.write((latex_source).encode('utf-8'))
+            latex_source = get_latex_source(formula, formula_env, self._stylefilename)
+            source.write(latex_source.encode('utf-8'))
             source.close()
 
             # execute platex

@@ -1,6 +1,7 @@
 .installed.cfg
 .pyc
 .swp
+.tox/
 bin
 _build
 include/python2.7
