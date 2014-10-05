@@ -112,7 +112,6 @@ class FormulaImagePlugin(plugins.NodeHandler):
 
             # execute platex
             try:
-                error = None
                 # `-no-shell-escape` blocks to invoke any commands
                 args = ['platex', '--interaction=nonstopmode',
                         '-no-shell-escape', source.name]
@@ -128,14 +127,12 @@ class FormulaImagePlugin(plugins.NodeHandler):
                 else:
                     error = exc
 
-            if error:
                 warning("Fail to convert formula: %s (reason: %s)" %
                         (formula, error))
                 return None
 
             # execute dvipng
             try:
-                error = None
                 dvifile = source.name.replace('.tex', '.dvi')
                 output = NamedTemporaryFile(suffix='.png')
                 args = ['dvipng', '-gamma', '1.5',
@@ -155,8 +152,6 @@ class FormulaImagePlugin(plugins.NodeHandler):
                 else:
                     error = exc
 
-            if error:
-                output.close()
                 warning("Fail to convert formula: %s (reason: %s)" %
                         (formula, error))
                 return None
