@@ -33,7 +33,7 @@ LATEX_SOURCE = r'''
 \usepackage{amssymb}
 \usepackage{amsfonts}
 \usepackage{bm}
-%(package)s
+%(usepackage)s
 \pagestyle{empty}
 \begin{document}
 \begin{%(formula_env)s}
@@ -42,36 +42,33 @@ LATEX_SOURCE = r'''
 \end{document}
 '''
 
-
-def get_latex_source(formula, env, stylefilename):
-    if stylefilename and os.path.exists(stylefilename):
-        including_package = '\\usepackage{%s}\n' % (
-            os.path.splitext(stylefilename)[0])
-    else:
-        including_package = ''
-
-    return LATEX_SOURCE % {
-              'formula': formula.strip(),
-              'formula_env': env,
-              'package': including_package}
-
 formula_images = []
 
 
-class FormulaImagePlugin(plugins.NodeHandler):
+def get_latex_source(formula, env, stylepackage):
+    if stylepackage:
+        usepackage = '\\usepackage{%s}\n' % stylepackage
+    else:
+        usepackage = ''
 
+    return LATEX_SOURCE % {'formula': formula.strip(),
+                           'formula_env': env,
+                           'usepackage': usepackage}
+
+
+class FormulaImagePlugin(plugins.NodeHandler):
     def __init__(self, diagram, **kwargs):
         super(FormulaImagePlugin, self).__init__(diagram, **kwargs)
         self.default_formula_env = kwargs.get('env', DEFAULT_ENVIRONMENT)
-        stylefilename = kwargs.get('style')
+        self.stylepackage = None
 
-        if 'style' in kwargs and not stylefilename.endswith('.sty'):
-            stylefilename = stylefilename + '.sty'
-
-        if stylefilename:
-            self._stylefilename = os.path.abspath(stylefilename)
-        else:
-            self._stylefilename = None
+        stylefile = kwargs.get('style')
+        if stylefile:
+            if not os.path.exists(stylefile):
+                warning('style file not found: %s' % stylefile)
+            else:
+                stylefile = os.path.abspath(stylefile)
+                self.stylepackage = os.path.splitext(stylefile)[0]
 
     def get_formula_env(self, uri):
         match = re.search(r'^math(?:\+([^/:]+))?://', uri)
@@ -108,7 +105,8 @@ class FormulaImagePlugin(plugins.NodeHandler):
             # create source .tex file
             source = NamedTemporaryFile(mode='w+b', suffix='.tex',
                                         dir=tmpdir, delete=False)
-            latex_source = get_latex_source(formula, formula_env, self._stylefilename)
+            latex_source = get_latex_source(formula, formula_env,
+                                            self.stylepackage)
             source.write(latex_source.encode('utf-8'))
             source.close()
 
