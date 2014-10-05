@@ -55,7 +55,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
     def get_formula_env(self, uri):
         match = re.search(r'^math(?:\+([^/:]+))?://', uri)
         if not match:
-            return True
+            return None
         elif match.group(1):
             return match.group(1)
         else:
