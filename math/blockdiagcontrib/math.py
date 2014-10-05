@@ -113,10 +113,9 @@ class FormulaImagePlugin(plugins.NodeHandler):
             # execute platex
             try:
                 error = None
+                # `-no-shell-escape` blocks to invoke any commands
                 args = ['platex', '--interaction=nonstopmode',
                         '-no-shell-escape', source.name]
-                # -no-shell-escape option: for restraint of destructive
-                # operation by style file
                 latex = Popen(args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
                 stdout, _ = latex.communicate()
                 if latex.returncode != 0:
