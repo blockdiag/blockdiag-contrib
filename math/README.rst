@@ -12,7 +12,7 @@ Example::
 
    blockdiag {
      plugin math;
-     A [label = "", background = "math://\int_{0}^{\infty} f(x)dx"];
+     A [label = "math://\int_{0}^{\infty} f(x)dx"];
      A -> B;
    }
 
