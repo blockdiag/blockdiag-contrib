@@ -24,6 +24,29 @@ Example::
      A -> B;
    }
 
+resize node to size of formula
+===============================
+`blockdiag-contrib-math` adds new node attribute named `resizable`.
+If `true` is set, the plugin resizes node to size of formula automatically::
+
+   blockdiag {
+     plugin math;
+     A [label = "", resizable = true, background = "math://\int_{0}^{\infty} f(x)dx"];
+     B [label = "", resizable = true, background = "math://\int_{0}^{\infty} f(x)dx \\ \int_{0}^{\infty} f(y) dy"];
+     A -> B;
+   }
+
+.. blockdiag::
+
+   blockdiag {
+     plugin math;
+     A [label = "", resizable = true, background = "math://\int_{0}^{\infty} f(x)dx"];
+     B [label = "", resizable = true, background = "math://\int_{0}^{\infty} f(x)dx \\ \int_{0}^{\infty} f(y) dy"];
+     A -> B;
+   }
+
+.. note:: `resizable` attribute depends on blockdiag-1.4.5 or newer.
+
 change style of formula
 ========================
 `blockdiagcontrib-math` supports applying user defined style::
