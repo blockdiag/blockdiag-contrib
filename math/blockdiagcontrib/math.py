@@ -64,11 +64,13 @@ class FormulaImagePlugin(plugins.NodeHandler):
 
         stylefile = kwargs.get('style')
         if stylefile:
-            if not os.path.exists(stylefile):
-                warning('style file not found: %s' % stylefile)
+            basedir = os.path.dirname(os.path.abspath(self.config.input))
+            stylepath = os.path.join(basedir, stylefile)
+            if os.path.exists(stylepath):
+                # stylename exists on relative path from source file
+                self.stylepackage = os.path.splitext(stylepath)[0]
             else:
-                stylefile = os.path.abspath(stylefile)
-                self.stylepackage = os.path.splitext(stylefile)[0]
+                warning('stylefile not found: %s' % stylefile)
 
     def get_formula_env(self, uri):
         match = re.search(r'^math(?:\+([^/:]+))?://', uri)
