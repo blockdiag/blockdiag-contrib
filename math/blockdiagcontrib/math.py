@@ -86,32 +86,38 @@ class FormulaImagePlugin(plugins.NodeHandler):
         value = unquote(attr.value)
 
         if attr.name == 'background':
-            formula_env = self.get_formula_env(value)
-            if formula_env is None:  # not math uri
-                return True
-
-            formula = value.split('://', 1)[1]
-            image = self.create_formula_image(formula, formula_env)
-
-            if image:
-                formula_images.append(image)
-                node.background = image
-            else:
-                node.background = None
-
-            return False
-        if attr.name == 'resizable':
-            if value.lower() not in ('true', 'false'):
-                warning('%s is not boolean value. ignored.' % value)
-
-            if value.lower() == 'true':
-                node.resizable = True
-            else:
-                node.resizable = False
-
-            return False
+            return self.on_background_changing(node, value)
+        elif attr.name == 'resizable':
+            return self.on_resizable_changing(node, value)
         else:
             return True
+
+    def on_background_changing(self, node, value):
+        formula_env = self.get_formula_env(value)
+        if formula_env is None:  # not math uri
+            return True
+
+        formula = value.split('://', 1)[1]
+        image = self.create_formula_image(formula, formula_env)
+
+        if image:
+            formula_images.append(image)
+            node.background = image
+        else:
+            node.background = None
+
+        return False
+
+    def on_resizable_changing(self, node, value):
+        if value.lower() not in ('true', 'false'):
+            warning('%s is not boolean value. ignored.' % value)
+
+        if value.lower() == 'true':
+            node.resizable = True
+        else:
+            node.resizable = False
+
+        return False
 
     def create_formula_image(self, formula, formula_env):
         try:
