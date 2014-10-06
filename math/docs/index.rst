@@ -24,6 +24,18 @@ Example::
      A -> B;
    }
 
+change style of formula
+========================
+`blockdiagcontrib-math` supports applying user defined style::
+
+   blockdiag {
+     plugin math[style = "mystyle.sty"];
+     A [label = "", background = "math://\int_{0}^{\infty} f(x)dx"];
+     A -> B;
+   }
+
+`blockdiagcontrib-math` searchs stylefile from same directory from source file.
+
 change formula envrionment
 ===========================
 `blockdiagcontrib-math` uses `align*` environment by default.
