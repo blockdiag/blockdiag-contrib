@@ -57,6 +57,68 @@ def get_latex_source(formula, env, stylepackage):
                            'usepackage': usepackage}
 
 
+def create_formula_image(formula, formula_env, stylepackage):
+    try:
+        tmpdir = mkdtemp()
+
+        # create source .tex file
+        source = NamedTemporaryFile(mode='w+b', suffix='.tex',
+                                    dir=tmpdir, delete=False)
+        latex_source = get_latex_source(formula, formula_env, stylepackage)
+        source.write(latex_source.encode('utf-8'))
+        source.close()
+
+        # execute platex
+        try:
+            # `-no-shell-escape` blocks to invoke any commands
+            args = ['platex', '--interaction=nonstopmode',
+                    '-no-shell-escape', source.name]
+            latex = Popen(args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
+            stdout, _ = latex.communicate()
+            if latex.returncode != 0:
+                warning("raise LaTeX Exception:\n\n%s" %
+                        stdout.decode('utf-8'))
+                return None
+        except Exception as exc:
+            if isinstance(exc, OSError) and exc.errno == ENOENT:
+                error = 'platex command not found'
+            else:
+                error = exc
+
+            warning("Fail to convert formula: %s (reason: %s)" %
+                    (formula, error))
+            return None
+
+        # execute dvipng
+        try:
+            dvifile = source.name.replace('.tex', '.dvi')
+            output = NamedTemporaryFile(suffix='.png')
+            args = ['dvipng', '-gamma', '1.5',
+                    '-D', '110', '-T', 'tight',
+                    '-bg', 'Transparent', '-z0', dvifile,
+                    '-o', output.name]
+            dvipng = Popen(args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
+            stdout, _ = dvipng.communicate()
+            if latex.returncode != 0:
+                warning("raise dvipng Exception:\n\n%s" %
+                        stdout.decode('utf-8'))
+                return None
+        except Exception as exc:
+            output.close()
+            if isinstance(exc, OSError) and exc.errno == ENOENT:
+                error = 'dvipng command not found'
+            else:
+                error = exc
+
+            warning("Fail to convert formula: %s (reason: %s)" %
+                    (formula, error))
+            return None
+
+        return output
+    finally:
+        rmtree(tmpdir)
+
+
 class FormulaImagePlugin(plugins.NodeHandler):
     def __init__(self, diagram, **kwargs):
         super(FormulaImagePlugin, self).__init__(diagram, **kwargs)
@@ -136,7 +198,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
 
     def set_formula_image_to_background(self, node, value, formula_env):
         formula = value.split('://', 1)[1]
-        image = self.create_formula_image(formula, formula_env)
+        image = create_formula_image(formula, formula_env, self.stylepackage)
         if image:
             formula_images.append(image)
             node.background = image
@@ -145,68 +207,6 @@ class FormulaImagePlugin(plugins.NodeHandler):
             node.background = None
 
         return False
-
-    def create_formula_image(self, formula, formula_env):
-        try:
-            tmpdir = mkdtemp()
-
-            # create source .tex file
-            source = NamedTemporaryFile(mode='w+b', suffix='.tex',
-                                        dir=tmpdir, delete=False)
-            latex_source = get_latex_source(formula, formula_env,
-                                            self.stylepackage)
-            source.write(latex_source.encode('utf-8'))
-            source.close()
-
-            # execute platex
-            try:
-                # `-no-shell-escape` blocks to invoke any commands
-                args = ['platex', '--interaction=nonstopmode',
-                        '-no-shell-escape', source.name]
-                latex = Popen(args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
-                stdout, _ = latex.communicate()
-                if latex.returncode != 0:
-                    warning("raise LaTeX Exception:\n\n%s" %
-                            stdout.decode('utf-8'))
-                    return None
-            except Exception as exc:
-                if isinstance(exc, OSError) and exc.errno == ENOENT:
-                    error = 'platex command not found'
-                else:
-                    error = exc
-
-                warning("Fail to convert formula: %s (reason: %s)" %
-                        (formula, error))
-                return None
-
-            # execute dvipng
-            try:
-                dvifile = source.name.replace('.tex', '.dvi')
-                output = NamedTemporaryFile(suffix='.png')
-                args = ['dvipng', '-gamma', '1.5',
-                        '-D', '110', '-T', 'tight',
-                        '-bg', 'Transparent', '-z0', dvifile,
-                        '-o', output.name]
-                dvipng = Popen(args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
-                stdout, _ = dvipng.communicate()
-                if latex.returncode != 0:
-                    warning("raise dvipng Exception:\n\n%s" %
-                            stdout.decode('utf-8'))
-                    return None
-            except Exception as exc:
-                output.close()
-                if isinstance(exc, OSError) and exc.errno == ENOENT:
-                    error = 'dvipng command not found'
-                else:
-                    error = exc
-
-                warning("Fail to convert formula: %s (reason: %s)" %
-                        (formula, error))
-                return None
-
-            return output
-        finally:
-            rmtree(tmpdir)
 
 
 def on_cleanup():
