@@ -93,44 +93,30 @@ class FormulaImagePlugin(plugins.NodeHandler):
         elif attr.name == 'resizable':
             return self.on_resizable_changing(node, value)
         elif attr.name == 'label':
-            formula_env = self.get_formula_env(value)
-            if formula_env is None:  # not math uri
-                return True
-
-            if node.background:
-                warning("Don't use both of math mode and background")
-                return None
-
-            formula = value.split('://', 1)[1]
-            image = self.create_formula_image(formula, formula_env)
-            if image:
-                formula_images.append(image)
-                node.background = image
-            else:
-                node.background = None
-
-            node.label = ""
-
-            return False
+            return self.on_label_changing(node, value)
         else:
             return True
+
+    def on_label_changing(self, node, value):
+        formula_env = self.get_formula_env(value)
+        if formula_env is None:  # not math uri
+            return True
+
+        if getattr(node, 'uses_formula_image', False):
+            warning('formula has already been specified: %s' % value)
+            return False
+
+        node.label = ""
+        return self.set_formula_image_to_background(node, value, formula_env)
 
     def on_background_changing(self, node, value):
         formula_env = self.get_formula_env(value)
         if formula_env is None:  # not math uri
             return True
 
-        formula = value.split('://', 1)[1]
-        image = self.create_formula_image(formula, formula_env)
-
-        if image:
-            formula_images.append(image)
-            node.background = image
-            node.uses_formula_image = True
-        else:
-            node.background = None
-
-        return False
+        warning('background = "math://..." is deprecated. '
+                'use label attribute.')
+        return self.set_formula_image_to_background(node, value, formula_env)
 
     def on_resizable_changing(self, node, value):
         if value.lower() not in ('true', 'false'):
@@ -147,6 +133,18 @@ class FormulaImagePlugin(plugins.NodeHandler):
         uses_formula_image = getattr(node, 'uses_formula_image', False)
         if uses_formula_image and node.resizable is True:
             node.width, node.height = get_image_size(node.background.name)
+
+    def set_formula_image_to_background(self, node, value, formula_env):
+        formula = value.split('://', 1)[1]
+        image = self.create_formula_image(formula, formula_env)
+        if image:
+            formula_images.append(image)
+            node.background = image
+            node.uses_formula_image = True
+        else:
+            node.background = None
+
+        return False
 
     def create_formula_image(self, formula, formula_env):
         try:
