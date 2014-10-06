@@ -10,7 +10,11 @@ import os
 from shutil import rmtree
 from tempfile import mkdtemp
 from collections import namedtuple
+from blockdiag.elements import DiagramNode
 from blockdiagcontrib.math import get_latex_source, FormulaImagePlugin
+
+
+Attr = namedtuple('Attr', 'name value')
 
 
 class TestBlockdiagcontribMath(unittest.TestCase):
@@ -78,3 +82,36 @@ class TestBlockdiagcontribMath(unittest.TestCase):
         finally:
             os.chdir(curdir)
             rmtree(tmpdir)
+
+    def test_FormulaImagePlugin_on_created(self):
+        plugin = FormulaImagePlugin(None)
+
+        node = DiagramNode('id')
+        self.assertFalse(hasattr(node, 'resizable'))
+        plugin.on_created(node)
+
+        self.assertTrue(hasattr(node, 'resizable'))
+        self.assertEqual(False, node.resizable)
+
+    def test_FormulaImagePlugin_on_resizable_changing(self):
+        plugin = FormulaImagePlugin(None)
+        node = DiagramNode('id')
+
+        plugin.on_created(node)
+        plugin.on_attr_changing(node, Attr('resizable', 'true'))
+        self.assertEqual(True, node.resizable)
+
+        plugin.on_attr_changing(node, Attr('resizable', 'false'))
+        self.assertEqual(False, node.resizable)
+
+        plugin.on_attr_changing(node, Attr('resizable', 'TRUE'))
+        self.assertEqual(True, node.resizable)
+
+        plugin.on_attr_changing(node, Attr('resizable', 'FALSE'))
+        self.assertEqual(False, node.resizable)
+
+        plugin.on_attr_changing(node, Attr('resizable', 'TRUE'))
+        self.assertEqual(True, node.resizable)
+
+        plugin.on_attr_changing(node, Attr('resizable', 'UNKNOWN'))
+        self.assertEqual(False, node.resizable)
