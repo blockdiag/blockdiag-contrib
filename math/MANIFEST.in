@@ -1,5 +1,8 @@
 include MANIFEST.in
+include CHANGES.rst
 include README.rst
 include LICENSE
 include tox.ini
+recursive-include docs *.py *.rst
 recursive-include src *.py
+recursive-include tests *.py
