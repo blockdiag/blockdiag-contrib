@@ -19,7 +19,6 @@ from subprocess import Popen, PIPE
 from shutil import rmtree
 from errno import ENOENT
 from tempfile import NamedTemporaryFile, mkdtemp
-from PIL import Image
 from blockdiag import plugins
 from blockdiag.utils import unquote
 from blockdiag.utils.images import get_image_size
@@ -172,7 +171,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
     def on_build_finished(self, node):
         if node.resizable not in ('True', False, 'False'):
             warning('input boolean or empty as resizable option')
-            return 
+            return
 
         if node.resizable == 'True':
             node.resizable = True
