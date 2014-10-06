@@ -8,8 +8,8 @@ Changelog
 
 0.2.0 (2010-10-03)
 ------------------
-* Use `align*` environment as default to switch to display mode (Thanks to @yassu)
-* Support changing environment for formulas (Thanks to @yassu)
+* Use `align*` environment as default to switch to display mode (Thanks to @yassu0320)
+* Support changing environment for formulas (Thanks to @yassu0320)
 
 0.1.2 (2014-9-14)
 -----------------
