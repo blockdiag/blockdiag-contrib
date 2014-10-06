@@ -11,6 +11,7 @@ from shutil import rmtree
 from tempfile import mkdtemp
 from collections import namedtuple
 from blockdiag.elements import DiagramNode
+from blockdiag.tests.utils import capture_stderr
 from blockdiagcontrib.math import get_latex_source, FormulaImagePlugin
 
 
@@ -32,6 +33,7 @@ class TestBlockdiagcontribMath(unittest.TestCase):
         self.assertIn('\\usepackage{mystyle}\n', source)
         self.assertIn('\\begin{myenv}\n    formula\n\\end{myenv}', source)
 
+    @capture_stderr
     def test_FormulaImagePlugin_init(self):
         Config = namedtuple('Config', 'input')
         try:
@@ -93,6 +95,7 @@ class TestBlockdiagcontribMath(unittest.TestCase):
         self.assertTrue(hasattr(node, 'resizable'))
         self.assertEqual(False, node.resizable)
 
+    @capture_stderr
     def test_FormulaImagePlugin_on_resizable_changing(self):
         plugin = FormulaImagePlugin(None)
         node = DiagramNode('id')
