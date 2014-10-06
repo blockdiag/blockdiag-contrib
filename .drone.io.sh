@@ -7,7 +7,7 @@ pip install --use-mirrors --upgrade detox misspellings check-manifest docutils
 
 # blockdiagcontrib-math
 cd math
-find src/ -name "*.py" | misspellings -f -
+find blockdiagcontrib/ tests/ -name "*.py" | misspellings -f -
 detox
 check-manifest
 cd ..
