@@ -19,8 +19,10 @@ from subprocess import Popen, PIPE
 from shutil import rmtree
 from errno import ENOENT
 from tempfile import NamedTemporaryFile, mkdtemp
+from PIL import Image
 from blockdiag import plugins
 from blockdiag.utils import unquote
+from blockdiag.utils.images import get_image_size
 from blockdiag.utils.logging import warning
 
 DEFAULT_ENVIRONMENT = 'align*'
@@ -90,6 +92,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
 
             formula = value.split('://', 1)[1]
             image = self.create_formula_image(formula, formula_env)
+
             if image:
                 formula_images.append(image)
                 node.background = image
@@ -103,6 +106,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
     def create_formula_image(self, formula, formula_env):
         try:
             tmpdir = mkdtemp()
+            formula = formula.strip()
 
             # create source .tex file
             source = NamedTemporaryFile(mode='w+b', suffix='.tex',
@@ -161,6 +165,28 @@ class FormulaImagePlugin(plugins.NodeHandler):
             return output
         finally:
             rmtree(tmpdir)
+
+    def on_created(self, node):
+        node.resizable = False
+
+    def on_build_finished(self, node):
+        if node.resizable not in ('True', False, 'False'):
+            warning('input boolean or empty as resizable option')
+            return 
+
+        if node.resizable == 'True':
+            node.resizable = True
+        elif node.resizable == 'False':
+            node.resizable = False
+        elif node.resizable is None:
+            node.resizable = False
+        else:
+            node.resizable = bool(node.resizable)
+
+        if node.resizable and node.background:
+            width, height = get_image_size(node.background.name)
+            node.width = width
+            node.height = height
 
 
 def on_cleanup():
