@@ -5,7 +5,7 @@ A plugin for `blockdiag` that provides LaTeX math as background of nodes.
 
 examples
 =========
-`blockdiagcontrib-math` detects background attribute starts with 'math://',
+`blockdiagcontrib-math` detects label attribute starts with 'math://',
 and converts it as math formula using LaTeX and dvipng.
 
 Example::

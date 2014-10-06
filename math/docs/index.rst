@@ -5,14 +5,14 @@ A plugin for `blockdiag` that provides LaTeX math as background of nodes.
 
 examples
 =========
-`blockdiagcontrib-math` detects background attribute starts with 'math://',
+`blockdiagcontrib-math` detects label attribute starts with 'math://',
 and converts it as math formula using LaTeX and dvipng.
 
 Example::
 
    blockdiag {
      plugin math;
-     A [label = "", background = "math://\int_{0}^{\infty} f(x)dx"];
+     A [label = "math://\int_{0}^{\infty} f(x)dx"];
      A -> B;
    }
 
@@ -20,7 +20,7 @@ Example::
 
    blockdiag {
      plugin math;
-     A [label = "", background = "math://\int_{0}^{\infty} f(x)dx"];
+     A [label = "math://\int_{0}^{\infty} f(x)dx"];
      A -> B;
    }
 
@@ -31,8 +31,8 @@ If `true` is set, the plugin resizes node to size of formula automatically::
 
    blockdiag {
      plugin math;
-     A [label = "", resizable = true, background = "math://\int_{0}^{\infty} f(x)dx"];
-     B [label = "", resizable = true, background = "math://\int_{0}^{\infty} f(x)dx \\ \int_{0}^{\infty} f(y) dy"];
+     A [resizable = true, label = "math://\int_{0}^{\infty} f(x)dx"];
+     B [resizable = true, label = "math://\int_{0}^{\infty} f(x)dx \\ \int_{0}^{\infty} f(y) dy"];
      A -> B;
    }
 
@@ -40,8 +40,8 @@ If `true` is set, the plugin resizes node to size of formula automatically::
 
    blockdiag {
      plugin math;
-     A [label = "", resizable = true, background = "math://\int_{0}^{\infty} f(x)dx"];
-     B [label = "", resizable = true, background = "math://\int_{0}^{\infty} f(x)dx \\ \int_{0}^{\infty} f(y) dy"];
+     A [resizable = true, label = "math://\int_{0}^{\infty} f(x)dx"];
+     B [resizable = true, label = "math://\int_{0}^{\infty} f(x)dx \\ \int_{0}^{\infty} f(y) dy"];
      A -> B;
    }
 
@@ -53,7 +53,7 @@ change style of formula
 
    blockdiag {
      plugin math[style = "mystyle.sty"];
-     A [label = "", background = "math://\int_{0}^{\infty} f(x)dx"];
+     A [label = "math://\int_{0}^{\infty} f(x)dx"];
      A -> B;
    }
 
@@ -72,7 +72,7 @@ Change default environment
 
       blockdiag {
         plugin math[env = "eqnarray"];
-        A [label = "", background = "math://\int_{0}^{\infty} f(x)dx"];
+        A [label = "math://\int_{0}^{\infty} f(x)dx"];
         A -> B;
       }
 
@@ -82,7 +82,7 @@ Change environment per node
 
       blockdiag {
         plugin math
-        A [label = "", background = "math+eqnarray://\int_{0}^{\infty} f(x)dx"];
+        A [label = "math+eqnarray://\int_{0}^{\infty} f(x)dx"];
         A -> B;
       }
 
