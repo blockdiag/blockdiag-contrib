@@ -106,6 +106,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
         if image:
             formula_images.append(image)
             node.background = image
+            node.uses_formula_image = True
         else:
             node.background = None
 
@@ -123,7 +124,8 @@ class FormulaImagePlugin(plugins.NodeHandler):
         return False
 
     def on_build_finished(self, node):
-        if node.resizable is True and node.background:
+        uses_formula_image = getattr(node, 'uses_formula_image', False)
+        if uses_formula_image and node.resizable is True:
             node.width, node.height = get_image_size(node.background.name)
 
     def create_formula_image(self, formula, formula_env):
