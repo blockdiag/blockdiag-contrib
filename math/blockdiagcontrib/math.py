@@ -149,7 +149,6 @@ class FormulaImagePlugin(plugins.NodeHandler):
     def create_formula_image(self, formula, formula_env):
         try:
             tmpdir = mkdtemp()
-            formula = formula.strip()
 
             # create source .tex file
             source = NamedTemporaryFile(mode='w+b', suffix='.tex',
