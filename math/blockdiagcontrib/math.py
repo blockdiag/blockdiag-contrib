@@ -92,6 +92,26 @@ class FormulaImagePlugin(plugins.NodeHandler):
             return self.on_background_changing(node, value)
         elif attr.name == 'resizable':
             return self.on_resizable_changing(node, value)
+        elif attr.name == 'label':
+            formula_env = self.get_formula_env(value)
+            if formula_env is None:  # not math uri
+                return True
+
+            if node.background:
+                warning("Don't use both of math mode and background")
+                return None
+
+            formula = value.split('://', 1)[1]
+            image = self.create_formula_image(formula, formula_env)
+            if image:
+                formula_images.append(image)
+                node.background = image
+            else:
+                node.background = None
+
+            node.label = ""
+
+            return False
         else:
             return True
 
