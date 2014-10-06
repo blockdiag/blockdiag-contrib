@@ -84,6 +84,7 @@ class FormulaImagePlugin(plugins.NodeHandler):
 
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
+
         if attr.name == 'background':
             formula_env = self.get_formula_env(value)
             if formula_env is None:  # not math uri
@@ -97,6 +98,16 @@ class FormulaImagePlugin(plugins.NodeHandler):
                 node.background = image
             else:
                 node.background = None
+
+            return False
+        if attr.name == 'resizable':
+            if value.lower() not in ('true', 'false'):
+                warning('%s is not boolean value. ignored.' % value)
+
+            if value.lower() == 'true':
+                node.resizable = True
+            else:
+                node.resizable = False
 
             return False
         else:
@@ -169,23 +180,8 @@ class FormulaImagePlugin(plugins.NodeHandler):
         node.resizable = False
 
     def on_build_finished(self, node):
-        if node.resizable not in ('True', False, 'False'):
-            warning('input boolean or empty as resizable option')
-            return
-
-        if node.resizable == 'True':
-            node.resizable = True
-        elif node.resizable == 'False':
-            node.resizable = False
-        elif node.resizable is None:
-            node.resizable = False
-        else:
-            node.resizable = bool(node.resizable)
-
-        if node.resizable and node.background:
-            width, height = get_image_size(node.background.name)
-            node.width = width
-            node.height = height
+        if node.resizable is True and node.background:
+            node.width, node.height = get_image_size(node.background.name)
 
 
 def on_cleanup():
