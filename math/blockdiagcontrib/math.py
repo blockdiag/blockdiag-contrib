@@ -82,6 +82,9 @@ class FormulaImagePlugin(plugins.NodeHandler):
         else:
             return self.default_formula_env
 
+    def on_created(self, node):
+        node.resizable = False
+
     def on_attr_changing(self, node, attr):
         value = unquote(attr.value)
 
@@ -118,6 +121,10 @@ class FormulaImagePlugin(plugins.NodeHandler):
             node.resizable = False
 
         return False
+
+    def on_build_finished(self, node):
+        if node.resizable is True and node.background:
+            node.width, node.height = get_image_size(node.background.name)
 
     def create_formula_image(self, formula, formula_env):
         try:
@@ -181,13 +188,6 @@ class FormulaImagePlugin(plugins.NodeHandler):
             return output
         finally:
             rmtree(tmpdir)
-
-    def on_created(self, node):
-        node.resizable = False
-
-    def on_build_finished(self, node):
-        if node.resizable is True and node.background:
-            node.width, node.height = get_image_size(node.background.name)
 
 
 def on_cleanup():
