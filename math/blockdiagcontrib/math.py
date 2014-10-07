@@ -25,7 +25,7 @@ from blockdiag.utils.images import get_image_size
 from blockdiag.utils.logging import warning
 
 DEFAULT_ENVIRONMENT = 'align*'
-X_PAD, Y_PAD = 10, 10
+X_PADDING, Y_PADDING = 10, 10
 
 LATEX_SOURCE = r'''
 \documentclass[12pt]{article}
@@ -196,8 +196,8 @@ class FormulaImagePlugin(plugins.NodeHandler):
         uses_formula_image = getattr(node, 'uses_formula_image', False)
         if uses_formula_image and node.resizable is True:
             node.width, node.height = get_image_size(node.background.name)
-            node.width += 2 * X_PAD     # top and bottom
-            node.height += 2 * Y_PAD    # left and right
+            node.width += 2 * X_PADDING     # top and bottom
+            node.height += 2 * Y_PADDING    # left and right
 
     def set_formula_image_to_background(self, node, value, formula_env):
         formula = value.split('://', 1)[1]
