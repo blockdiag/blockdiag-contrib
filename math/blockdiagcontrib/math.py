@@ -196,8 +196,8 @@ class FormulaImagePlugin(plugins.NodeHandler):
         uses_formula_image = getattr(node, 'uses_formula_image', False)
         if uses_formula_image and node.resizable is True:
             node.width, node.height = get_image_size(node.background.name)
-            node.width += 2 * X_PADDING     # top and bottom
-            node.height += 2 * Y_PADDING    # left and right
+            node.width += 2 * X_PADDING     # left and right
+            node.height += 2 * Y_PADDING    # top and bottom
 
     def set_formula_image_to_background(self, node, value, formula_env):
         formula = value.split('://', 1)[1]
