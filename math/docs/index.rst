@@ -71,7 +71,7 @@ Change default environment
    math plugin allows `env` option. it changes default formula environment::
 
       blockdiag {
-        plugin math[env = "eqnarray"];
+        plugin math[env = "eqnarray*"];
         A [label = "math://\int_{0}^{\infty} f(x)dx"];
         A -> B;
       }
@@ -82,7 +82,7 @@ Change environment per node
 
       blockdiag {
         plugin math
-        A [label = "math+eqnarray://\int_{0}^{\infty} f(x)dx"];
+        A [label = "math+eqnarray*://\int_{0}^{\infty} f(x)dx"];
         A -> B;
       }
 
