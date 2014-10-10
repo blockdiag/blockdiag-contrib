@@ -57,7 +57,7 @@ change style of formula
      A -> B;
    }
 
-`blockdiagcontrib-math` searchs stylefile from same directory from source file.
+`blockdiagcontrib-math` searchs stylefile from directory of source file.
 
 change formula envrionment
 ===========================
