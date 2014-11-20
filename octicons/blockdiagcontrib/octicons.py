@@ -296,7 +296,7 @@ class OcticonPlugin(plugins.NodeHandler):
 
 def on_cleanup():
     for key, image in icon_images.items():
-        image.close()
+        del image
         del icon_images[key]
 
 
